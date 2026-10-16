@@ -1,0 +1,18 @@
+{
+  "name": "swiss-safe-drive",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["packages/*", "landing"],
+  "scripts": {
+    "dev": "npm -w @ssd/demo-01-camera run dev",
+    "dev:camera": "npm -w @ssd/demo-01-camera run dev",
+    "dev:eyes": "npm -w @ssd/demo-02-eyes run dev",
+    "dev:hazard": "npm -w @ssd/demo-03-hazard run dev",
+    "dev:data": "npm -w @ssd/demo-04-data run dev",
+    "build:all": "npm --workspaces run build --if-present",
+    "preview:camera": "npm -w @ssd/demo-01-camera run preview",
+    "preview:eyes": "npm -w @ssd/demo-02-eyes run preview",
+    "preview:hazard": "npm -w @ssd/demo-03-hazard run preview",
+    "preview:data": "npm -w @ssd/demo-04-data run preview"
+  }
+}

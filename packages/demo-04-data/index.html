@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Training Data Collector — Swiss Safe Drive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-content">
+        <div class="loading-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="swiss-cross">
+            <rect width="32" height="32" fill="#e30613" rx="2"/>
+            <rect x="6" y="13" width="20" height="6" fill="white"/>
+            <rect x="13" y="6" width="6" height="20" fill="white"/>
+          </svg>
+          <span>SWISS SAFE DRIVE</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="loading-status" id="loadingStatus">Initializing...</div>
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="header-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="swiss-cross">
+          <rect width="32" height="32" fill="#e30613" rx="2"/>
+          <rect x="6" y="13" width="20" height="6" fill="white"/>
+          <rect x="13" y="6" width="6" height="20" fill="white"/>
+        </svg>
+        <span class="brand-name">SWISS SAFE DRIVE</span>
+      </div>
+      <div class="header-center">
+        <span class="demo-badge">AI Training Data Collector — Demo 04</span>
+      </div>
+      <div class="header-status">
+        <span class="system-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Offline</span>
+        </span>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="video-section">
+        <div class="alert-banner alert-banner--collecting" id="alertBanner">
+          <span class="alert-icon" id="alertIcon">◉</span>
+          <span class="alert-text" id="alertText">Initializing data collection pipeline...</span>
+        </div>
+        <div class="video-wrapper">
+          <video id="video" autoplay muted playsinline></video>
+          <canvas id="overlay"></canvas>
+          <div class="camera-permission" id="cameraPermission">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+            <div class="permission-title">Camera access required</div>
+            <div class="permission-desc">Simulates a vehicle-mounted data collection device</div>
+            <button class="permission-btn" id="permissionBtn">Activate Collector</button>
+          </div>
+        </div>
+        <div class="video-footer">
+          <span class="video-info" id="videoResolution">—</span>
+          <span class="video-info" id="videoFps">FPS: —</span>
+          <span class="video-info" id="gpsDisplay">GPS: —</span>
+          <span class="video-info" id="syncStatus">Sync: Idle</span>
+        </div>
+      </section>
+
+      <aside class="panel">
+
+        <div class="panel-section">
+          <div class="panel-label">COLLECTION STATUS</div>
+          <div class="status-indicator">
+            <div class="indicator-dot indicator-dot--collecting" id="indicatorDot"></div>
+            <div class="indicator-text" id="indicatorText">Initializing</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">SENSOR DATA</div>
+          <div class="sensor-grid">
+            <div class="sensor-row">
+              <span class="sensor-label">Latitude</span>
+              <span class="sensor-value" id="sLat">—</span>
+            </div>
+            <div class="sensor-row">
+              <span class="sensor-label">Longitude</span>
+              <span class="sensor-value" id="sLon">—</span>
+            </div>
+            <div class="sensor-row">
+              <span class="sensor-label">Accel X</span>
+              <span class="sensor-value" id="sAccX">—</span>
+            </div>
+            <div class="sensor-row">
+              <span class="sensor-label">Accel Y</span>
+              <span class="sensor-value" id="sAccY">—</span>
+            </div>
+            <div class="sensor-row">
+              <span class="sensor-label">Accel Z</span>
+              <span class="sensor-value" id="sAccZ">—</span>
+            </div>
+            <div class="sensor-row">
+              <span class="sensor-label">Quality</span>
+              <span class="sensor-value" id="sQuality">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">DATASET STATISTICS</div>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-value" id="statFrames">0</div>
+              <div class="stat-label">Frames captured</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="statLabels">0</div>
+              <div class="stat-label">Labels generated</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="statClasses">0</div>
+              <div class="stat-label">Unique classes</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="statSize">0 MB</div>
+              <div class="stat-label">Dataset size</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-label">CLASS DISTRIBUTION</div>
+          <div class="class-bars" id="classBars">
+            <div class="no-detections">Waiting for detections...</div>
+          </div>
+        </div>
+
+        <div class="panel-section panel-section--grow">
+          <div class="panel-label">UPLOAD QUEUE</div>
+          <div class="event-log" id="eventLog"></div>
+        </div>
+
+        <div class="panel-section panel-section--footer">
+          <div class="model-info">
+            <span>Auto-labeling: COCO-SSD · GPS: simulated (Zurich)</span>
+            <span>IMU: simulated · Sync: batch every 100 frames</span>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

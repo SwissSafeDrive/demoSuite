@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swiss Safe Drive — AI Demo Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --swiss-red: #e30613;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e0e0e0;
+      --bg: #fff;
+      --bg2: #f5f5f5;
+      --safe: #2e7d32;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 48px;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-name { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; }
+
+    .hero {
+      max-width: 760px;
+      margin: 80px auto 64px;
+      padding: 0 48px;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--swiss-red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    .demos {
+      max-width: 960px;
+      margin: 0 auto 80px;
+      padding: 0 48px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .demo-card {
+      border: 1px solid var(--border);
+      padding: 28px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+
+    .demo-card--live:hover {
+      border-color: var(--text);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .demo-card--soon {
+      background: var(--bg2);
+      cursor: default;
+    }
+
+    .demo-number {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .demo-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .demo-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+
+    .demo-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-status--live { color: var(--safe); }
+    .demo-status--soon { color: var(--muted); }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-dot--live {
+      background: var(--safe);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot--soon { background: var(--muted); }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(46,125,50,0.4); }
+      50% { box-shadow: 0 0 0 4px rgba(46,125,50,0); }
+    }
+
+    .demo-features {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .demo-features li {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 3px 0;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .demo-features li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--border);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 48px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+        <rect width="32" height="32" fill="#e30613" rx="2"/>
+        <rect x="6" y="13" width="20" height="6" fill="white"/>
+        <rect x="13" y="6" width="6" height="20" fill="white"/>
+      </svg>
+      <span class="logo-name">SWISS SAFE DRIVE</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="hero-eyebrow">AI Demo Suite — Agire Foundation Pitch</div>
+      <h1>Making roads safer through artificial intelligence</h1>
+      <p>A suite of AI-powered tools for real-time driver monitoring, hazard detection, and autonomous driving model training. Built to demonstrate how AI can meaningfully reduce road incidents.</p>
+    </div>
+
+    <div class="demos">
+
+      <a href="http://localhost:5173" target="_blank" class="demo-card demo-card--live">
+        <div class="demo-number">DEMO 01</div>
+        <div class="demo-title">Camera AI Analyzer</div>
+        <div class="demo-desc">Real-time detection of distracted drivers using standard security camera footage. No specialized hardware required.</div>
+        <ul class="demo-features">
+          <li>Cell phone detection via COCO-SSD</li>
+          <li>Driver–phone proximity analysis</li>
+          <li>Live alert system with event log</li>
+          <li>Runs entirely in browser (TensorFlow.js)</li>
+        </ul>
+        <div class="demo-status demo-status--live">
+          <span class="status-dot status-dot--live"></span>
+          Live Demo
+        </div>
+      </a>
+
+      <a href="http://localhost:5174" target="_blank" class="demo-card demo-card--live">
+        <div class="demo-number">DEMO 02</div>
+        <div class="demo-title">Eye Concentration Monitor</div>
+        <div class="demo-desc">Detects driver drowsiness and distraction by tracking gaze direction and eye closure duration in real time.</div>
+        <ul class="demo-features">
+          <li>MediaPipe FaceLandmarker · 478 landmarks</li>
+          <li>Blendshape-based gaze state analysis</li>
+          <li>Drowsiness timer with escalating alerts</li>
+          <li>Gaze compass direction indicator</li>
+        </ul>
+        <div class="demo-status demo-status--live">
+          <span class="status-dot status-dot--live"></span>
+          Live Demo
+        </div>
+      </a>
+
+      <a href="http://localhost:5175" target="_blank" class="demo-card demo-card--live">
+        <div class="demo-number">DEMO 03</div>
+        <div class="demo-title">In-Car Hazard Alert System</div>
+        <div class="demo-desc">Dashcam-style AI that detects pedestrians, vehicles and cyclists and scores collision risk in real time.</div>
+        <ul class="demo-features">
+          <li>COCO-SSD object detection · 80 classes</li>
+          <li>Proximity scoring by bounding box height</li>
+          <li>Hazard level gauge (clear → danger)</li>
+          <li>Simulated speed readout · audio alerts</li>
+        </ul>
+        <div class="demo-status demo-status--live">
+          <span class="status-dot status-dot--live"></span>
+          Live Demo
+        </div>
+      </a>
+
+      <a href="http://localhost:5176" target="_blank" class="demo-card demo-card--live">
+        <div class="demo-number">DEMO 04</div>
+        <div class="demo-title">AI Training Data Collector</div>
+        <div class="demo-desc">Simulates a vehicle-mounted data collection device — auto-labeling scenes and streaming to a training dataset pipeline.</div>
+        <ul class="demo-features">
+          <li>COCO-SSD auto-labeling with annotation IDs</li>
+          <li>Simulated GPS (Zurich) + IMU sensor fusion</li>
+          <li>Dataset quality scoring per frame</li>
+          <li>Batch sync to cloud every 100 frames</li>
+        </ul>
+        <div class="demo-status demo-status--live">
+          <span class="status-dot status-dot--live"></span>
+          Live Demo
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    <span>Swiss Safe Drive — Confidential pitch materials for Agire Foundation</span>
+    <span>Powered by TensorFlow.js · MediaPipe · Web Platform APIs</span>
+  </footer>
+</body>
+</html>
