@@ -1,0 +1,63 @@
+# macOS
+.DS_Store
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+
+# Databases / runtime data
+*.db
+*.sqlite
+*.sqlite3
+data/
+runtime/
+logs/
+tmp/
+temp/
+
+# AI models / large generated artifacts
+models/
+weights/
+checkpoints/
+*.pt
+*.onnx
+*.engine
+
+# IDEs
+.vscode/
+.idea/
+
+# Backups
+*.bak
+*.backup
+*.orig
+
+# Generated packages
+*.dmg
+*.pkg
+*.zip
+
+# Local agent/runtime files
+.codex/
+.claude/
+.openclaw/
