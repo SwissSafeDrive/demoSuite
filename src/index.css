@@ -1,0 +1,52 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+}
+
+/* Lazy-load fallback */
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.app-loading__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #6b6b6b;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+/* Back-to-demos link used by all demo page headers */
+.header-back {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary, #6b6b6b);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+
+.header-back:hover {
+  color: var(--color-text-primary, #1a1a1a);
+}
