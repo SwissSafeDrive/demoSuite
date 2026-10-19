@@ -18,20 +18,33 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+backend/.venv/
+backend/venv/
+backend/build/
+backend/dist/
+*.spec
 
-# Node / frontend
+# Node / frontend / Rust / Tauri
 node_modules/
+app/node_modules/
 dist/
+app/dist/
 build/
 .vite/
+target/
+app/src-tauri/target/
+app/src-tauri/resources/swisssafedrive-backend-*
 
-# Databases / runtime data
+# Databases / runtime data / captures
 *.db
 *.sqlite
 *.sqlite3
+capturas/
+backend/capturas/
 data/
 runtime/
 logs/
+*.log
 tmp/
 temp/
 
