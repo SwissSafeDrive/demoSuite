@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { init } from "../demos/data/init";
 import "../demos/data/style.css";
 
-export default function Demo04Data() {
+export default function Demo05Data() {
   useLayoutEffect(() => {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -50,7 +50,7 @@ export default function Demo04Data() {
           <span className="brand-name">SWISS SAFE DRIVE</span>
         </div>
         <div className="header-center">
-          <span className="demo-badge">AI Training Data Collector — Demo 04</span>
+          <span className="demo-badge">AI Training Data Collector — Demo 05</span>
         </div>
         <div className="header-status">
           <Link to="/" className="header-back">

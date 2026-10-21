@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { init } from "../demos/camera/init";
 import "../demos/camera/style.css";
 
-export default function Demo01Camera() {
+export default function Demo02Camera() {
   useLayoutEffect(() => {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -52,7 +52,7 @@ export default function Demo01Camera() {
           <span className="brand-name">SWISS SAFE DRIVE</span>
         </div>
         <div className="header-center">
-          <span className="demo-badge">Camera AI Analyzer — Demo 01</span>
+          <span className="demo-badge">Camera AI Analyzer — Demo 02</span>
         </div>
         <div className="header-status">
           <Link to="/" className="header-back">
