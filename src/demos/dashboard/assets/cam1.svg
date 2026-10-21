@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#1a1a1a"/>
+  <!-- Sky -->
+  <rect x="0" y="0" width="640" height="150" fill="#2c2c3a"/>
+  <!-- Road -->
+  <polygon points="0,360 640,360 480,200 160,200" fill="#333"/>
+  <!-- Road markings -->
+  <rect x="308" y="210" width="24" height="30" fill="#888" opacity="0.6"/>
+  <rect x="308" y="255" width="24" height="30" fill="#888" opacity="0.6"/>
+  <rect x="308" y="300" width="24" height="30" fill="#888" opacity="0.6"/>
+  <!-- Left building -->
+  <rect x="0" y="60" width="120" height="140" fill="#252535"/>
+  <rect x="10" y="75" width="25" height="18" fill="#e8c040" opacity="0.7"/>
+  <rect x="45" y="75" width="25" height="18" fill="#e8c040" opacity="0.4"/>
+  <rect x="80" y="75" width="25" height="18" fill="#e8c040" opacity="0.8"/>
+  <rect x="10" y="105" width="25" height="18" fill="#e8c040" opacity="0.5"/>
+  <rect x="80" y="105" width="25" height="18" fill="#e8c040" opacity="0.3"/>
+  <!-- Right building -->
+  <rect x="520" y="40" width="120" height="160" fill="#252535"/>
+  <rect x="530" y="55" width="25" height="18" fill="#e8c040" opacity="0.6"/>
+  <rect x="565" y="55" width="25" height="18" fill="#e8c040" opacity="0.9"/>
+  <rect x="600" y="55" width="15" height="18" fill="#e8c040" opacity="0.4"/>
+  <rect x="530" y="85" width="25" height="18" fill="#e8c040" opacity="0.7"/>
+  <rect x="600" y="85" width="15" height="18" fill="#e8c040" opacity="0.6"/>
+  <!-- Car on road -->
+  <rect x="240" y="255" width="80" height="35" rx="4" fill="#444"/>
+  <rect x="248" y="248" width="64" height="20" rx="3" fill="#3a3a4a"/>
+  <circle cx="258" cy="294" r="8" fill="#222"/>
+  <circle cx="302" cy="294" r="8" fill="#222"/>
+  <rect x="248" y="258" width="16" height="10" fill="#ffee80" opacity="0.8"/>
+  <rect x="296" y="258" width="16" height="10" fill="#ff6040" opacity="0.9"/>
+  <!-- Timestamp overlay -->
+  <rect x="0" y="0" width="640" height="22" fill="#000" opacity="0.5"/>
+  <text x="8" y="15" font-family="monospace" font-size="12" fill="#0f0" opacity="0.9">CAM-01 | VIA LUGANO 14, BELLINZONA | 2024-11-15 14:23:07</text>
+  <!-- Corner markers -->
+  <line x1="0" y1="0" x2="20" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="0" x2="0" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="620" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="640" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="20" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="0" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="620" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="640" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <!-- Detection box -->
+  <rect x="238" y="244" width="84" height="52" fill="none" stroke="#f00" stroke-width="2" stroke-dasharray="4,2" opacity="0.8"/>
+  <text x="240" y="242" font-family="monospace" font-size="10" fill="#f00" opacity="0.9">PHONE 91%</text>
+</svg>

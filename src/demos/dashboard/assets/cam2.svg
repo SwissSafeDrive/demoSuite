@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#1a1a1a"/>
+  <!-- Sky / overcast -->
+  <rect x="0" y="0" width="640" height="130" fill="#2a2a2a"/>
+  <!-- Intersection / piazza -->
+  <rect x="0" y="200" width="640" height="160" fill="#2e2e2e"/>
+  <!-- Crosswalk stripes -->
+  <rect x="160" y="205" width="24" height="100" fill="#555" opacity="0.7"/>
+  <rect x="196" y="205" width="24" height="100" fill="#555" opacity="0.7"/>
+  <rect x="232" y="205" width="24" height="100" fill="#555" opacity="0.7"/>
+  <!-- Buildings background -->
+  <rect x="0" y="50" width="180" height="150" fill="#222"/>
+  <rect x="460" y="30" width="180" height="170" fill="#222"/>
+  <rect x="200" y="80" width="240" height="120" fill="#2a2a2a"/>
+  <!-- Windows -->
+  <rect x="20" y="65" width="20" height="15" fill="#ffd060" opacity="0.7"/>
+  <rect x="50" y="65" width="20" height="15" fill="#ffd060" opacity="0.4"/>
+  <rect x="80" y="65" width="20" height="15" fill="#ffd060" opacity="0.9"/>
+  <rect x="140" y="65" width="20" height="15" fill="#ffd060" opacity="0.5"/>
+  <rect x="470" y="45" width="20" height="15" fill="#ffd060" opacity="0.8"/>
+  <rect x="500" y="45" width="20" height="15" fill="#ffd060" opacity="0.3"/>
+  <rect x="570" y="45" width="20" height="15" fill="#ffd060" opacity="0.6"/>
+  <!-- Vehicle at intersection -->
+  <rect x="340" y="215" width="90" height="40" rx="4" fill="#3c3c4c"/>
+  <rect x="348" y="208" width="74" height="22" rx="3" fill="#2e2e3e"/>
+  <circle cx="360" cy="258" r="9" fill="#181818"/>
+  <circle cx="412" cy="258" r="9" fill="#181818"/>
+  <rect x="348" y="220" width="18" height="12" fill="#fff8a0" opacity="0.7"/>
+  <rect x="404" y="220" width="18" height="12" fill="#ff4020" opacity="0.9"/>
+  <!-- Timestamp overlay -->
+  <rect x="0" y="0" width="640" height="22" fill="#000" opacity="0.5"/>
+  <text x="8" y="15" font-family="monospace" font-size="12" fill="#0f0" opacity="0.9">CAM-02 | PIAZZA GRANDE, LOCARNO | 2024-11-15 14:08:52</text>
+  <!-- Corner markers -->
+  <line x1="0" y1="0" x2="20" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="0" x2="0" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="620" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="640" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="20" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="0" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="620" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="640" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <!-- Detection box -->
+  <rect x="338" y="204" width="94" height="58" fill="none" stroke="#f00" stroke-width="2" stroke-dasharray="4,2" opacity="0.8"/>
+  <text x="340" y="202" font-family="monospace" font-size="10" fill="#f00" opacity="0.9">PHONE 78%</text>
+</svg>
