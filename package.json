@@ -2,17 +2,39 @@
   "name": "swiss-safe-drive",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["packages/*", "landing"],
+  "type": "module",
   "scripts": {
-    "dev": "npm -w @ssd/demo-01-camera run dev",
-    "dev:camera": "npm -w @ssd/demo-01-camera run dev",
-    "dev:eyes": "npm -w @ssd/demo-02-eyes run dev",
-    "dev:hazard": "npm -w @ssd/demo-03-hazard run dev",
-    "dev:data": "npm -w @ssd/demo-04-data run dev",
-    "build:all": "npm --workspaces run build --if-present",
-    "preview:camera": "npm -w @ssd/demo-01-camera run preview",
-    "preview:eyes": "npm -w @ssd/demo-02-eyes run preview",
-    "preview:hazard": "npm -w @ssd/demo-03-hazard run preview",
-    "preview:data": "npm -w @ssd/demo-04-data run preview"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.14",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs": "^4.22.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@superpanch/quality-feedback-loop": "file:../quality-feedback-loop",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.15.0",
+    "vite": "^5.4.10"
   }
 }
