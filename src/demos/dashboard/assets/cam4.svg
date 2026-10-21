@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#1a1a1a"/>
+  <!-- Mountain road scene -->
+  <rect x="0" y="0" width="640" height="160" fill="#1c2030"/>
+  <!-- Mountain silhouettes -->
+  <polygon points="0,160 100,60 200,160" fill="#151520"/>
+  <polygon points="100,160 250,40 400,160" fill="#181828"/>
+  <polygon points="300,160 450,70 600,160" fill="#151520"/>
+  <polygon points="500,160 600,90 640,160" fill="#181828"/>
+  <!-- Road perspective -->
+  <polygon points="100,360 540,360 410,190 230,190" fill="#282828"/>
+  <!-- Guard rail left -->
+  <rect x="95" y="200" width="6" height="160" fill="#666" opacity="0.5"/>
+  <rect x="95" y="210" width="130" height="4" fill="#666" opacity="0.4"/>
+  <rect x="95" y="240" width="130" height="4" fill="#666" opacity="0.4"/>
+  <!-- Guard rail right -->
+  <rect x="539" y="200" width="6" height="160" fill="#666" opacity="0.5"/>
+  <rect x="415" y="210" width="130" height="4" fill="#666" opacity="0.4"/>
+  <rect x="415" y="240" width="130" height="4" fill="#666" opacity="0.4"/>
+  <!-- Road center line -->
+  <rect x="316" y="200" width="8" height="22" fill="#888" opacity="0.4"/>
+  <rect x="316" y="234" width="8" height="22" fill="#888" opacity="0.4"/>
+  <rect x="316" y="268" width="8" height="22" fill="#888" opacity="0.4"/>
+  <rect x="316" y="302" width="8" height="22" fill="#888" opacity="0.4"/>
+  <rect x="316" y="336" width="8" height="22" fill="#888" opacity="0.4"/>
+  <!-- Vehicle -->
+  <rect x="285" y="248" width="82" height="38" rx="4" fill="#404050"/>
+  <rect x="293" y="240" width="66" height="22" rx="3" fill="#303040"/>
+  <circle cx="300" cy="289" r="8" fill="#181818"/>
+  <circle cx="352" cy="289" r="8" fill="#181818"/>
+  <rect x="293" y="252" width="16" height="12" fill="#fff8a0" opacity="0.9"/>
+  <rect x="343" y="252" width="16" height="12" fill="#ff4020" opacity="0.9"/>
+  <!-- Timestamp overlay -->
+  <rect x="0" y="0" width="640" height="22" fill="#000" opacity="0.5"/>
+  <text x="8" y="15" font-family="monospace" font-size="12" fill="#0f0" opacity="0.9">CAM-04 | VIA SAN GOTTARDO 8, AIROLO | 2024-11-15 13:38:45</text>
+  <!-- Corner markers -->
+  <line x1="0" y1="0" x2="20" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="0" x2="0" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="620" y2="0" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="0" x2="640" y2="20" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="20" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="0" y1="360" x2="0" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="620" y2="360" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <line x1="640" y1="360" x2="640" y2="340" stroke="#0f0" stroke-width="2" opacity="0.5"/>
+  <!-- Detection box -->
+  <rect x="283" y="236" width="86" height="57" fill="none" stroke="#f00" stroke-width="2" stroke-dasharray="4,2" opacity="0.8"/>
+  <text x="285" y="234" font-family="monospace" font-size="10" fill="#f00" opacity="0.9">PHONE 62%</text>
+</svg>

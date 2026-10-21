@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 
+const Demo01Dashboard = lazy(() => import("./pages/Demo01Dashboard"));
 const Demo02Camera = lazy(() => import("./pages/Demo02Camera"));
 const Demo03Eyes = lazy(() => import("./pages/Demo03Eyes"));
 const Demo04Hazard = lazy(() => import("./pages/Demo04Hazard"));
@@ -28,6 +29,7 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/demo-01" element={<Demo01Dashboard />} />
           <Route path="/demo-02" element={<Demo02Camera />} />
           <Route path="/demo-03" element={<Demo03Eyes />} />
           <Route path="/demo-04" element={<Demo04Hazard />} />

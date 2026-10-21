@@ -1,4 +1,5 @@
 import type { Estado, Registro } from './types';
+import { cameraImages } from './assets/index';
 
 let nextId = 5;
 
@@ -8,7 +9,7 @@ const SEED: Array<Omit<Registro, 'id' | 'timestamp'>> = [
     confianza: 0.91,
     ubicacion: 'Via Lugano 14, Bellinzona',
     identificatore_demo: 'INF-2024-0042',
-    imagen_path: null,
+    imagen_path: cameraImages[0],
     estado: 'pendiente',
     agente_id: null,
     fecha_decision: null,
@@ -20,7 +21,7 @@ const SEED: Array<Omit<Registro, 'id' | 'timestamp'>> = [
     confianza: 0.78,
     ubicacion: 'Piazza Grande, Locarno',
     identificatore_demo: 'INF-2024-0041',
-    imagen_path: null,
+    imagen_path: cameraImages[1],
     estado: 'pendiente',
     agente_id: null,
     fecha_decision: null,
@@ -32,7 +33,7 @@ const SEED: Array<Omit<Registro, 'id' | 'timestamp'>> = [
     confianza: 0.85,
     ubicacion: 'Corso Elvezia 12, Lugano',
     identificatore_demo: 'INF-2024-0040',
-    imagen_path: null,
+    imagen_path: cameraImages[2],
     estado: 'pendiente',
     agente_id: null,
     fecha_decision: null,
@@ -44,7 +45,7 @@ const SEED: Array<Omit<Registro, 'id' | 'timestamp'>> = [
     confianza: 0.62,
     ubicacion: 'Via San Gottardo 8, Airolo',
     identificatore_demo: 'INF-2024-0039',
-    imagen_path: null,
+    imagen_path: cameraImages[3],
     estado: 'pendiente',
     agente_id: null,
     fecha_decision: null,

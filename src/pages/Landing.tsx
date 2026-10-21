@@ -103,6 +103,24 @@ export default function Landing() {
         </div>
 
         <div className="landing-demos">
+          <Link to="/demo-01" className="demo-card demo-card--live">
+            <div className="demo-number">DEMO 01</div>
+            <div className="demo-title">Police Review Dashboard</div>
+            <div className="demo-desc">
+              Cruscotto istituzionale per la revisione umana delle infrazioni segnalate dall'AI. Nessuna multa viene emessa automaticamente.
+            </div>
+            <ul className="demo-features">
+              <li>Lista registri con badge di stato</li>
+              <li>Dettaglio con immagine e metadati AI</li>
+              <li>Flusso decisionale: conferma / scarta / revisione</li>
+              <li>Dati simulati — nessun backend richiesto</li>
+            </ul>
+            <div className="demo-status demo-status--live">
+              <span className="status-dot status-dot--live" />
+              Live Demo
+            </div>
+          </Link>
+
           <Link to="/demo-02" className="demo-card demo-card--live">
             <div className="demo-number">DEMO 02</div>
             <div className="demo-title">Camera AI Analyzer</div>
