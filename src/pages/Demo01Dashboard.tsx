@@ -1,7 +1,8 @@
-import { useLayoutEffect, useReducer, useState } from 'react';
+import { useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Estado, Registro } from '../demos/dashboard/types';
 import { seedDataset, applyDecision, addSimulatedRegistro } from '../demos/dashboard/state';
+import { cameraImages } from '../demos/dashboard/assets/index';
 import RegistriList from '../demos/dashboard/RegistriList';
 import RegistroDetalle from '../demos/dashboard/RegistroDetalle';
 import CameraEnDiretta from '../demos/dashboard/CameraEnDiretta';
@@ -24,16 +25,7 @@ function reducer(state: Registro[], action: Action): Registro[] {
 }
 
 export default function Demo01Dashboard() {
-  useLayoutEffect(() => {
-    document.body.style.overflow = 'auto';
-    document.documentElement.style.overflow = 'auto';
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, []);
-
-  const [registros, dispatch] = useReducer(reducer, undefined, seedDataset);
+  const [registros, dispatch] = useReducer(reducer, undefined, () => seedDataset(cameraImages));
   const [view, setView] = useState<View>('list');
   const [selectedId, setSelectedId] = useState<number | null>(null);
 

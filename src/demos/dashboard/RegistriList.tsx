@@ -1,27 +1,9 @@
 import type { Registro, Estado } from './types';
+import { estadoLabel, estadoBadgeClass } from './estadoMeta';
 
 interface Props {
   registros: Registro[];
   onOpenRegistro: (r: Registro) => void;
-}
-
-function estadoBadgeStyle(estado: Estado): string {
-  const base = 'db-badge';
-  switch (estado) {
-    case 'pendiente': return `${base} ${base}--pendiente`;
-    case 'revisado': return `${base} ${base}--revisado`;
-    case 'confirmato': return `${base} ${base}--confirmato`;
-    case 'descartato': return `${base} ${base}--descartato`;
-  }
-}
-
-function estadoLabel(estado: Estado): string {
-  switch (estado) {
-    case 'pendiente': return 'In attesa';
-    case 'revisado': return 'Revisionato';
-    case 'confirmato': return 'Confermato';
-    case 'descartato': return 'Scartato';
-  }
 }
 
 function relativeTime(date: Date): string {
@@ -33,14 +15,12 @@ function relativeTime(date: Date): string {
   return `${hours} or${hours === 1 ? 'a' : 'e'} fa`;
 }
 
+const ESTADOS: Estado[] = ['pendiente', 'revisado', 'confirmato', 'descartato'];
+
 export default function RegistriList({ registros, onOpenRegistro }: Props) {
-  const counts: Record<Estado, number> = {
-    pendiente: 0,
-    revisado: 0,
-    confirmato: 0,
-    descartato: 0,
-  };
-  for (const r of registros) counts[r.estado]++;
+  const counts = Object.fromEntries(
+    ESTADOS.map((e) => [e, registros.filter((r) => r.estado === e).length]),
+  ) as Record<Estado, number>;
 
   const sorted = [...registros].sort(
     (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
@@ -89,22 +69,12 @@ export default function RegistriList({ registros, onOpenRegistro }: Props) {
       `}</style>
 
       <div className="db-stats-bar">
-        <div className="db-stat-pill db-stat-pill--pendiente">
-          <span className="db-stat-count">{counts.pendiente}</span>
-          In attesa
-        </div>
-        <div className="db-stat-pill db-stat-pill--revisado">
-          <span className="db-stat-count">{counts.revisado}</span>
-          Revisionati
-        </div>
-        <div className="db-stat-pill db-stat-pill--confirmato">
-          <span className="db-stat-count">{counts.confirmato}</span>
-          Confermati
-        </div>
-        <div className="db-stat-pill db-stat-pill--descartato">
-          <span className="db-stat-count">{counts.descartato}</span>
-          Scartati
-        </div>
+        {ESTADOS.map((e) => (
+          <div key={e} className={`db-stat-pill db-stat-pill--${e}`}>
+            <span className="db-stat-count">{counts[e]}</span>
+            {estadoLabel(e)}
+          </div>
+        ))}
       </div>
 
       {sorted.length === 0 ? (
@@ -128,7 +98,7 @@ export default function RegistriList({ registros, onOpenRegistro }: Props) {
                 <td className="db-time">{relativeTime(r.timestamp)}</td>
                 <td className="db-confidence">{Math.round(r.confianza * 100)}%</td>
                 <td>
-                  <span className={estadoBadgeStyle(r.estado)}>
+                  <span className={estadoBadgeClass(r.estado)}>
                     {estadoLabel(r.estado)}
                   </span>
                 </td>
