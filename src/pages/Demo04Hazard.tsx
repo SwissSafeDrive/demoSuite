@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
-import { init } from "../demos/eyes/init";
-import "../demos/eyes/style.css";
+import { init } from "../demos/hazard/init";
+import "../demos/hazard/style.css";
 
-export default function Demo02Eyes() {
+export default function Demo04Hazard() {
   useLayoutEffect(() => {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -50,7 +50,7 @@ export default function Demo02Eyes() {
           <span className="brand-name">SWISS SAFE DRIVE</span>
         </div>
         <div className="header-center">
-          <span className="demo-badge">Eye Concentration Monitor — Demo 02</span>
+          <span className="demo-badge">In-Car Hazard Alert System — Demo 04</span>
         </div>
         <div className="header-status">
           <Link to="/" className="header-back">
@@ -70,7 +70,7 @@ export default function Demo02Eyes() {
               ●
             </span>
             <span className="alert-text" id="alertText">
-              Initializing face detection...
+              Initializing hazard detection...
             </span>
           </div>
           <div className="video-wrapper">
@@ -78,13 +78,13 @@ export default function Demo02Eyes() {
             <canvas id="overlay" />
             <div className="camera-permission" id="cameraPermission">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
               </svg>
-              <div className="permission-title">Camera access required</div>
-              <div className="permission-desc">Used locally — no data leaves your device</div>
+              <div className="permission-title">Dashcam view required</div>
+              <div className="permission-desc">Point your camera at the road ahead or a scene with traffic</div>
               <button className="permission-btn" id="permissionBtn">
-                Grant Camera Access
+                Start Camera
               </button>
             </div>
           </div>
@@ -95,14 +95,16 @@ export default function Demo02Eyes() {
             <span className="video-info" id="videoFps">
               FPS: —
             </span>
-            <span className="video-info">Model: MediaPipe FaceLandmarker</span>
-            <span className="video-info">478 landmarks · Blendshapes</span>
+            <span className="video-info" id="simSpeed">
+              Speed: — km/h
+            </span>
+            <span className="video-info">Model: COCO-SSD · 80 classes</span>
           </div>
         </section>
 
         <aside className="panel">
           <div className="panel-section">
-            <div className="panel-label">ATTENTION STATUS</div>
+            <div className="panel-label">HAZARD STATUS</div>
             <div className="status-indicator">
               <div className="indicator-dot indicator-dot--clear" id="indicatorDot" />
               <div className="indicator-text" id="indicatorText">
@@ -112,46 +114,35 @@ export default function Demo02Eyes() {
           </div>
 
           <div className="panel-section">
-            <div className="panel-label">EYE METRICS</div>
-            <div className="eye-meters">
-              <div className="eye-row">
-                <span className="eye-label">Left eye</span>
-                <div className="eye-bar-wrap">
-                  <div className="eye-bar eye-bar--left" id="eyeBarLeft" />
+            <div className="panel-label">HAZARD SCORE</div>
+            <div className="hazard-gauge">
+              <div className="gauge-track">
+                <div className="gauge-fill" id="gaugeFill" />
+                <div className="gauge-zones">
+                  <span className="gauge-zone-label" style={{ left: 0 }}>
+                    0
+                  </span>
+                  <span className="gauge-zone-label" style={{ left: "33%" }}>
+                    Low
+                  </span>
+                  <span className="gauge-zone-label" style={{ left: "60%" }}>
+                    High
+                  </span>
+                  <span className="gauge-zone-label" style={{ right: 0 }}>
+                    MAX
+                  </span>
                 </div>
-                <span className="eye-pct" id="eyePctLeft">
-                  —
-                </span>
               </div>
-              <div className="eye-row">
-                <span className="eye-label">Right eye</span>
-                <div className="eye-bar-wrap">
-                  <div className="eye-bar eye-bar--right" id="eyeBarRight" />
-                </div>
-                <span className="eye-pct" id="eyePctRight">
-                  —
-                </span>
+              <div className="gauge-value" id="gaugeValue">
+                0%
               </div>
             </div>
           </div>
 
           <div className="panel-section">
-            <div className="panel-label">GAZE DIRECTION</div>
-            <div className="gaze-compass" id="gazeCompass">
-              <div className="compass-zone compass-zone--tl">↖</div>
-              <div className="compass-zone compass-zone--tc">↑</div>
-              <div className="compass-zone compass-zone--tr">↗</div>
-              <div className="compass-zone compass-zone--ml">←</div>
-              <div className="compass-zone compass-zone--mc active" id="gazeZone">
-                ●
-              </div>
-              <div className="compass-zone compass-zone--mr">→</div>
-              <div className="compass-zone compass-zone--bl">↙</div>
-              <div className="compass-zone compass-zone--bc">↓</div>
-              <div className="compass-zone compass-zone--br">↘</div>
-            </div>
-            <div className="gaze-state" id="gazeState">
-              —
+            <div className="panel-label">DETECTED HAZARDS</div>
+            <div className="hazards-list" id="hazardsList">
+              <div className="no-detections">No hazards detected</div>
             </div>
           </div>
 
@@ -165,16 +156,16 @@ export default function Demo02Eyes() {
                 <div className="stat-label">Session duration</div>
               </div>
               <div className="stat">
-                <div className="stat-value stat-value--danger" id="statIncidents">
+                <div className="stat-value stat-value--danger" id="statWarnings">
                   0
                 </div>
-                <div className="stat-label">Alerts triggered</div>
+                <div className="stat-label">Warnings issued</div>
               </div>
               <div className="stat">
-                <div className="stat-value" id="statGazeOff">
-                  0s
+                <div className="stat-value" id="statMaxScore">
+                  0%
                 </div>
-                <div className="stat-label">Total gaze off-road</div>
+                <div className="stat-label">Peak hazard score</div>
               </div>
               <div className="stat">
                 <div className="stat-value" id="statFps">
@@ -186,14 +177,14 @@ export default function Demo02Eyes() {
           </div>
 
           <div className="panel-section panel-section--grow">
-            <div className="panel-label">EVENT LOG</div>
+            <div className="panel-label">ALERT LOG</div>
             <div className="event-log" id="eventLog" />
           </div>
 
           <div className="panel-section panel-section--footer">
             <div className="model-info">
-              <span>Blendshape analysis · Gaze estimation</span>
-              <span>Alert thresholds: gaze 2s · closure 1.5s</span>
+              <span>Hazard classes: person · vehicle · cyclist</span>
+              <span>Proximity scored by bounding box height</span>
             </div>
           </div>
         </aside>

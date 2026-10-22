@@ -2,10 +2,11 @@ import { lazy, Suspense } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 
-const Demo01Camera = lazy(() => import("./pages/Demo01Camera"));
-const Demo02Eyes = lazy(() => import("./pages/Demo02Eyes"));
-const Demo03Hazard = lazy(() => import("./pages/Demo03Hazard"));
-const Demo04Data = lazy(() => import("./pages/Demo04Data"));
+const Demo01Dashboard = lazy(() => import("./pages/Demo01Dashboard"));
+const Demo02Camera = lazy(() => import("./pages/Demo02Camera"));
+const Demo03Eyes = lazy(() => import("./pages/Demo03Eyes"));
+const Demo04Hazard = lazy(() => import("./pages/Demo04Hazard"));
+const Demo05Data = lazy(() => import("./pages/Demo05Data"));
 
 function LoadingFallback() {
   return (
@@ -28,10 +29,11 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/demo-01" element={<Demo01Camera />} />
-          <Route path="/demo-02" element={<Demo02Eyes />} />
-          <Route path="/demo-03" element={<Demo03Hazard />} />
-          <Route path="/demo-04" element={<Demo04Data />} />
+          <Route path="/demo-01" element={<Demo01Dashboard />} />
+          <Route path="/demo-02" element={<Demo02Camera />} />
+          <Route path="/demo-03" element={<Demo03Eyes />} />
+          <Route path="/demo-04" element={<Demo04Hazard />} />
+          <Route path="/demo-05" element={<Demo05Data />} />
         </Routes>
       </Suspense>
     </HashRouter>

@@ -105,6 +105,24 @@ export default function Landing() {
         <div className="landing-demos">
           <Link to="/demo-01" className="demo-card demo-card--live">
             <div className="demo-number">DEMO 01</div>
+            <div className="demo-title">Police Review Dashboard</div>
+            <div className="demo-desc">
+              Cruscotto istituzionale per la revisione umana delle infrazioni segnalate dall'AI. Nessuna multa viene emessa automaticamente.
+            </div>
+            <ul className="demo-features">
+              <li>Lista registri con badge di stato</li>
+              <li>Dettaglio con immagine e metadati AI</li>
+              <li>Flusso decisionale: conferma / scarta / revisione</li>
+              <li>Dati simulati — nessun backend richiesto</li>
+            </ul>
+            <div className="demo-status demo-status--live">
+              <span className="status-dot status-dot--live" />
+              Live Demo
+            </div>
+          </Link>
+
+          <Link to="/demo-02" className="demo-card demo-card--live">
+            <div className="demo-number">DEMO 02</div>
             <div className="demo-title">Camera AI Analyzer</div>
             <div className="demo-desc">
               Real-time detection of distracted drivers using standard security camera footage. No specialized hardware required.
@@ -121,8 +139,8 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-02" className="demo-card demo-card--live">
-            <div className="demo-number">DEMO 02</div>
+          <Link to="/demo-03" className="demo-card demo-card--live">
+            <div className="demo-number">DEMO 03</div>
             <div className="demo-title">Eye Concentration Monitor</div>
             <div className="demo-desc">
               Detects driver drowsiness and distraction by tracking gaze direction and eye closure duration in real time.
@@ -139,8 +157,8 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-03" className="demo-card demo-card--live">
-            <div className="demo-number">DEMO 03</div>
+          <Link to="/demo-04" className="demo-card demo-card--live">
+            <div className="demo-number">DEMO 04</div>
             <div className="demo-title">In-Car Hazard Alert System</div>
             <div className="demo-desc">Dashcam-style AI that detects pedestrians, vehicles and cyclists and scores collision risk in real time.</div>
             <ul className="demo-features">
@@ -155,8 +173,8 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-04" className="demo-card demo-card--live">
-            <div className="demo-number">DEMO 04</div>
+          <Link to="/demo-05" className="demo-card demo-card--live">
+            <div className="demo-number">DEMO 05</div>
             <div className="demo-title">AI Training Data Collector</div>
             <div className="demo-desc">
               Simulates a vehicle-mounted data collection device — auto-labeling scenes and streaming to a training dataset pipeline.

@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
-import { init } from "../demos/hazard/init";
-import "../demos/hazard/style.css";
+import { init } from "../demos/eyes/init";
+import "../demos/eyes/style.css";
 
-export default function Demo03Hazard() {
+export default function Demo03Eyes() {
   useLayoutEffect(() => {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
@@ -50,7 +50,7 @@ export default function Demo03Hazard() {
           <span className="brand-name">SWISS SAFE DRIVE</span>
         </div>
         <div className="header-center">
-          <span className="demo-badge">In-Car Hazard Alert System — Demo 03</span>
+          <span className="demo-badge">Eye Concentration Monitor — Demo 03</span>
         </div>
         <div className="header-status">
           <Link to="/" className="header-back">
@@ -70,7 +70,7 @@ export default function Demo03Hazard() {
               ●
             </span>
             <span className="alert-text" id="alertText">
-              Initializing hazard detection...
+              Initializing face detection...
             </span>
           </div>
           <div className="video-wrapper">
@@ -78,13 +78,13 @@ export default function Demo03Hazard() {
             <canvas id="overlay" />
             <div className="camera-permission" id="cameraPermission">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <polygon points="23 7 16 12 23 17 23 7" />
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
               </svg>
-              <div className="permission-title">Dashcam view required</div>
-              <div className="permission-desc">Point your camera at the road ahead or a scene with traffic</div>
+              <div className="permission-title">Camera access required</div>
+              <div className="permission-desc">Used locally — no data leaves your device</div>
               <button className="permission-btn" id="permissionBtn">
-                Start Camera
+                Grant Camera Access
               </button>
             </div>
           </div>
@@ -95,16 +95,14 @@ export default function Demo03Hazard() {
             <span className="video-info" id="videoFps">
               FPS: —
             </span>
-            <span className="video-info" id="simSpeed">
-              Speed: — km/h
-            </span>
-            <span className="video-info">Model: COCO-SSD · 80 classes</span>
+            <span className="video-info">Model: MediaPipe FaceLandmarker</span>
+            <span className="video-info">478 landmarks · Blendshapes</span>
           </div>
         </section>
 
         <aside className="panel">
           <div className="panel-section">
-            <div className="panel-label">HAZARD STATUS</div>
+            <div className="panel-label">ATTENTION STATUS</div>
             <div className="status-indicator">
               <div className="indicator-dot indicator-dot--clear" id="indicatorDot" />
               <div className="indicator-text" id="indicatorText">
@@ -114,35 +112,46 @@ export default function Demo03Hazard() {
           </div>
 
           <div className="panel-section">
-            <div className="panel-label">HAZARD SCORE</div>
-            <div className="hazard-gauge">
-              <div className="gauge-track">
-                <div className="gauge-fill" id="gaugeFill" />
-                <div className="gauge-zones">
-                  <span className="gauge-zone-label" style={{ left: 0 }}>
-                    0
-                  </span>
-                  <span className="gauge-zone-label" style={{ left: "33%" }}>
-                    Low
-                  </span>
-                  <span className="gauge-zone-label" style={{ left: "60%" }}>
-                    High
-                  </span>
-                  <span className="gauge-zone-label" style={{ right: 0 }}>
-                    MAX
-                  </span>
+            <div className="panel-label">EYE METRICS</div>
+            <div className="eye-meters">
+              <div className="eye-row">
+                <span className="eye-label">Left eye</span>
+                <div className="eye-bar-wrap">
+                  <div className="eye-bar eye-bar--left" id="eyeBarLeft" />
                 </div>
+                <span className="eye-pct" id="eyePctLeft">
+                  —
+                </span>
               </div>
-              <div className="gauge-value" id="gaugeValue">
-                0%
+              <div className="eye-row">
+                <span className="eye-label">Right eye</span>
+                <div className="eye-bar-wrap">
+                  <div className="eye-bar eye-bar--right" id="eyeBarRight" />
+                </div>
+                <span className="eye-pct" id="eyePctRight">
+                  —
+                </span>
               </div>
             </div>
           </div>
 
           <div className="panel-section">
-            <div className="panel-label">DETECTED HAZARDS</div>
-            <div className="hazards-list" id="hazardsList">
-              <div className="no-detections">No hazards detected</div>
+            <div className="panel-label">GAZE DIRECTION</div>
+            <div className="gaze-compass" id="gazeCompass">
+              <div className="compass-zone compass-zone--tl">↖</div>
+              <div className="compass-zone compass-zone--tc">↑</div>
+              <div className="compass-zone compass-zone--tr">↗</div>
+              <div className="compass-zone compass-zone--ml">←</div>
+              <div className="compass-zone compass-zone--mc active" id="gazeZone">
+                ●
+              </div>
+              <div className="compass-zone compass-zone--mr">→</div>
+              <div className="compass-zone compass-zone--bl">↙</div>
+              <div className="compass-zone compass-zone--bc">↓</div>
+              <div className="compass-zone compass-zone--br">↘</div>
+            </div>
+            <div className="gaze-state" id="gazeState">
+              —
             </div>
           </div>
 
@@ -156,16 +165,16 @@ export default function Demo03Hazard() {
                 <div className="stat-label">Session duration</div>
               </div>
               <div className="stat">
-                <div className="stat-value stat-value--danger" id="statWarnings">
+                <div className="stat-value stat-value--danger" id="statIncidents">
                   0
                 </div>
-                <div className="stat-label">Warnings issued</div>
+                <div className="stat-label">Alerts triggered</div>
               </div>
               <div className="stat">
-                <div className="stat-value" id="statMaxScore">
-                  0%
+                <div className="stat-value" id="statGazeOff">
+                  0s
                 </div>
-                <div className="stat-label">Peak hazard score</div>
+                <div className="stat-label">Total gaze off-road</div>
               </div>
               <div className="stat">
                 <div className="stat-value" id="statFps">
@@ -177,14 +186,14 @@ export default function Demo03Hazard() {
           </div>
 
           <div className="panel-section panel-section--grow">
-            <div className="panel-label">ALERT LOG</div>
+            <div className="panel-label">EVENT LOG</div>
             <div className="event-log" id="eventLog" />
           </div>
 
           <div className="panel-section panel-section--footer">
             <div className="model-info">
-              <span>Hazard classes: person · vehicle · cyclist</span>
-              <span>Proximity scored by bounding box height</span>
+              <span>Blendshape analysis · Gaze estimation</span>
+              <span>Alert thresholds: gaze 2s · closure 1.5s</span>
             </div>
           </div>
         </aside>

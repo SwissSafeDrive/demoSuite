@@ -5,3 +5,5 @@ dist/
 *.log
 packages/
 landing/
+AGENTS.md
+docs/
