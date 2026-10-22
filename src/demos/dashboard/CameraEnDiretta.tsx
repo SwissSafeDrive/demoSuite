@@ -84,7 +84,9 @@ export default function CameraEnDiretta({ onCapture, onBack }: Props) {
       <div className="db-cam-title">Telecamera in diretta</div>
 
       {cameraState === 'requesting' && (
-        <div className="db-cam-requesting">Richiesta accesso telecamera...</div>
+        <div className="db-cam-requesting">
+          <span>Richiesta accesso telecamera...</span>
+        </div>
       )}
 
       {cameraState === 'error' && (

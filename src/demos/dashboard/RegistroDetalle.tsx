@@ -1,19 +1,11 @@
 import { useState } from 'react';
 import type { Registro, Estado } from './types';
+import { estadoLabel } from './estadoMeta';
 
 interface Props {
   registro: Registro;
   onDecide: (estado: Estado) => void;
   onBack: () => void;
-}
-
-function estadoLabel(estado: Estado): string {
-  switch (estado) {
-    case 'pendiente': return 'In attesa';
-    case 'revisado': return 'Revisionato';
-    case 'confirmato': return 'Confermato';
-    case 'descartato': return 'Scartato';
-  }
 }
 
 export default function RegistroDetalle({ registro, onDecide, onBack }: Props) {
