@@ -3,30 +3,27 @@ import { submitDecision, fetchImageBlobUrl } from "../api/client";
 import RecordedPlayer from "../media/RecordedPlayer";
 import { recordStateLabels } from "./recordStateLabels";
 
-export default function CaseDetail({ record, selection, onOpenPass, onClearPass, onBack }) {
-  const hasFootage = !record || (record.origin === "simulated" && !record.image_path);
-  const backToRecord = selection && record;
+export default function CaseDetail({ record, passId, clipId, seekTime, onOpenPass, onBack, opening }) {
+  const hasImage = Boolean(record.image_path);
   return (
-    <div className={selection ? "case-detail-container single-case-analysis" : "case-detail-container"}>
+    <div className={passId ? "case-detail-container single-case-analysis" : "case-detail-container"}>
       <div className="case-detail-header">
-        <button onClick={backToRecord ? onClearPass : onBack}>
-          {backToRecord ? "← Back to record" : "← Back to records"}
-        </button>
-        <h2>{selection ? "Single Case Analysis" : "Case detail"}</h2>
+        <button onClick={onBack} disabled={opening}>← Back to Candidate list</button>
+        <h2>{passId ? "Single Case Analysis" : "Case detail"}</h2>
       </div>
-      {hasFootage && (
-        <RecordedPlayer selection={selection} onOpenPass={onOpenPass} onClearPass={onClearPass} />
-      )}
-      {record && (
-        <div hidden={Boolean(selection)}>
-          <RecordDetail key={record.id} record={record} hasFootage={hasFootage} />
-        </div>
-      )}
+
+      {passId ? (
+        <RecordedPlayer passId={passId} initialClipId={clipId} seekTime={seekTime} onOpenPass={onOpenPass} />
+      ) : record.origin === "simulated" && !hasImage ? (
+        <RecordedPlayer onOpenPass={onOpenPass} />
+      ) : null}
+
+      <RecordReview key={record.id} record={record} passId={passId} />
     </div>
   );
 }
 
-function RecordDetail({ record, hasFootage }) {
+function RecordReview({ record, passId }) {
   const [state, setState] = useState(record.state);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -77,9 +74,9 @@ function RecordDetail({ record, hasFootage }) {
   };
 
   const getBadgeClass = (confidence) => {
-    if (confidence >= 0.85) return "badge-alta";
-    if (confidence >= 0.7) return "badge-media";
-    return "badge-baja";
+    if (confidence >= 0.85) return "badge-high";
+    if (confidence >= 0.7) return "badge-medium";
+    return "badge-low";
   };
 
   const saveDecision = async (nextState) => {
@@ -99,7 +96,7 @@ function RecordDetail({ record, hasFootage }) {
 
   return (
     <>
-      {hasFootage ? null : hasImage && imageUrl ? (
+      {!passId && !(record.origin === "simulated" && !hasImage) && (hasImage && imageUrl ? (
         <div className="case-detail-capture">
           <img src={imageUrl} alt="Captured image" />
         </div>
@@ -112,64 +109,71 @@ function RecordDetail({ record, hasFootage }) {
             </p>
           </div>
         </div>
-      )}
+      ))}
 
-      <div className="case-detail-info">
-        <h3>Informazioni sul registro</h3>
-        <div className="case-detail-info-grid">
-          <div className="case-detail-info-item">
-            <strong>ID registro</strong>
-            {record.event_id}
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Data e ora</strong>
-            {formatDate(record.timestamp)}
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Luogo</strong>
-            {record.location}
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Origine</strong>
-            {record.origin === "camera" ? "📷 Camera" : "🧪 Simulato"}
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Confidenza IA</strong>
-            <span
-              className={`registro-card-badge ${getBadgeClass(record.confidence)}`}
-              style={{
-                position: "static",
-                display: "inline-block",
-                marginTop: "4px",
-              }}
-            >
-              {(record.confidence * 100).toFixed(1)}%
-            </span>
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Identificatore tecnico demo</strong>
-            {record.demo_id || record.event_id}
-          </div>
-          <div className="case-detail-info-item">
-            <strong>Stato attuale</strong>
-            <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
-              {recordStateLabels[state]}
-            </span>
-          </div>
-          {record.operator_id && (
-            <div className="case-detail-info-item">
-              <strong>Agente</strong>
-              {record.operator_id}
-            </div>
-          )}
-          {record.decision_at && (
-            <div className="case-detail-info-item">
-              <strong>Data decisione</strong>
-              {formatDate(record.decision_at)}
-            </div>
-          )}
+      {passId ? (
+        <div className="case-detail-info">
+          <p>Review state · {recordStateLabels[state]}</p>
         </div>
-      </div>
+      ) : (
+        <div className="case-detail-info">
+          <h3>Informazioni sul registro</h3>
+          <div className="case-detail-info-grid">
+            <div className="case-detail-info-item">
+              <strong>ID registro</strong>
+              {record.event_id}
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Data e ora</strong>
+              {formatDate(record.timestamp)}
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Luogo</strong>
+              {record.location}
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Origine</strong>
+              {record.origin === "camera" ? "📷 Camera" : "🧪 Simulato"}
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Confidenza IA</strong>
+              <span
+                className={`record-badge ${getBadgeClass(record.confidence)}`}
+                style={{
+                  position: "static",
+                  display: "inline-block",
+                  marginTop: "4px",
+                }}
+              >
+                {(record.confidence * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Identificatore tecnico demo</strong>
+              {record.demo_id || record.event_id}
+            </div>
+            <div className="case-detail-info-item">
+              <strong>Stato attuale</strong>
+              <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
+                {recordStateLabels[state]}
+              </span>
+            </div>
+            {record.operator_id && (
+              <div className="case-detail-info-item">
+                <strong>Agente</strong>
+                {record.operator_id}
+              </div>
+            )}
+            {record.decision_at && (
+              <div className="case-detail-info-item">
+                <strong>Data decisione</strong>
+                {formatDate(record.decision_at)}
+              </div>
+            )}
+          </div>
+        </div>
+
+      )}
 
       <div className="case-detail-info">
         <h3>Decisione dell'agente (validazione umana obbligatoria)</h3>

@@ -5,7 +5,7 @@ import WindshieldPanel from "./WindshieldPanel";
 
 const CLIPS = ["Cba002", "Cba052", "Cba065"];
 
-function ClipVideo({ playback, passId, onOpenPass }) {
+function ClipVideo({ playback, passId, seekTime, onOpenPass }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const displayedTime = useRef(null);
@@ -21,7 +21,7 @@ function ClipVideo({ playback, passId, onOpenPass }) {
     let frameId;
     const draw = () => {
       const time = displayedTime.current ?? video.currentTime;
-      drawVideoOverlay(canvas, video, sample, playback, time);
+      drawVideoOverlay(canvas, video, sample, playback, time, passId);
     };
     const showFrame = (time) => {
       displayedTime.current = time;
@@ -64,7 +64,7 @@ function ClipVideo({ playback, passId, onOpenPass }) {
       if (video.cancelVideoFrameCallback) video.cancelVideoFrameCallback(frameId);
       else cancelAnimationFrame(frameId);
     };
-  }, [playback]);
+  }, [playback, passId]);
 
   function clickVehicle(event) {
     const video = event.currentTarget;
@@ -77,7 +77,7 @@ function ClipVideo({ playback, passId, onOpenPass }) {
     );
     if (hit) {
       event.preventDefault();
-      onOpenPass(hit, playback.clip.id);
+      onOpenPass({ passId: hit, clipId: playback.clip.id });
     }
   }
 
@@ -97,6 +97,9 @@ function ClipVideo({ playback, passId, onOpenPass }) {
             disableRemotePlayback
             playsInline
             preload="auto"
+            onLoadedMetadata={(event) => {
+              if (seekTime != null) event.currentTarget.currentTime = seekTime;
+            }}
             onError={() => setError(true)}
             onClick={clickVehicle}
           />
@@ -108,7 +111,7 @@ function ClipVideo({ playback, passId, onOpenPass }) {
   );
 }
 
-function SelectedClip({ clipId, passId, onOpenPass }) {
+function SelectedClip({ clipId, passId, seekTime, onOpenPass }) {
   const [playback, setPlayback] = useState(null);
   const [error, setError] = useState(false);
 
@@ -123,25 +126,23 @@ function SelectedClip({ clipId, passId, onOpenPass }) {
 
   if (error) return <p role="alert">Recorded footage is unavailable.</p>;
   if (!playback) return <p role="status">Loading recorded footage…</p>;
-  return <ClipVideo playback={playback} passId={passId} onOpenPass={onOpenPass} />;
+  return <ClipVideo playback={playback} passId={passId} seekTime={seekTime} onOpenPass={onOpenPass} />;
 }
 
-export default function RecordedPlayer({ selection, onOpenPass, onClearPass }) {
-  const [chosenClip, setChosenClip] = useState(selection?.clipId ?? CLIPS[0]);
-  const clipId = selection?.clipId ?? chosenClip;
-  function changeClip(event) {
-    setChosenClip(event.target.value);
-    onClearPass();
-  }
+export default function RecordedPlayer({ passId, initialClipId, seekTime, onOpenPass }) {
+  const [chosenClip, setClipId] = useState(CLIPS[0]);
+  const clipId = initialClipId ?? chosenClip;
   return (
     <section className="case-detail-footage">
-      <label>
-        Demo footage
-        <select value={clipId} onChange={changeClip}>
-          {CLIPS.map((clip) => <option key={clip}>{clip}</option>)}
-        </select>
-      </label>
-      <SelectedClip key={clipId} clipId={clipId} passId={selection?.passId} onOpenPass={onOpenPass} />
+      {!passId && (
+        <label>
+          Demo footage
+          <select value={clipId} onChange={(event) => setClipId(event.target.value)}>
+            {CLIPS.map((clip) => <option key={clip}>{clip}</option>)}
+          </select>
+        </label>
+      )}
+      <SelectedClip key={clipId} clipId={clipId} passId={passId} seekTime={seekTime} onOpenPass={onOpenPass} />
     </section>
   );
 }

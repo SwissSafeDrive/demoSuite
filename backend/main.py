@@ -10,14 +10,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import func, inspect, text
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
+from candidate_membership import candidate_row
 from clip_routes import create_clip_router
 from crop_routes import router as crop_router
 from database import Base, engine, get_db
 from models import Record, SIMULATED_NOTICE, TECHNICAL_NOTICE
 from pass_fixture import load_passes
-from schemas import DecisionIn, StatisticsOut, RecordOut
+from schemas import DecisionIn, ManualFlagIn as FlagUpdateIn, StatisticsOut, RecordOut
 
 
 def ensure_schema():
@@ -383,3 +385,51 @@ def flag_pass(pass_id: str, body: ManualFlagIn):
     record = get_pass(pass_id)
     manual_flags.add(pass_id)
     return with_manual_flag(record)
+
+
+@app.patch("/api/passes/{pass_id}/flag", dependencies=[Depends(verify_session_token)])
+def update_pass_flag(pass_id: str, flag: FlagUpdateIn):
+    get_pass(pass_id)
+    if flag.flagged_manually:
+        manual_flags.add(pass_id)
+    else:
+        manual_flags.discard(pass_id)
+    return {"passId": pass_id, "flagged_manually": flag.flagged_manually}
+
+
+@app.get("/api/candidates", dependencies=[Depends(verify_session_token)])
+def list_candidates(db: Session = Depends(get_db)):
+    rows = []
+    for record in load_passes().values():
+        row = candidate_row(with_manual_flag(record))
+        if row is not None:
+            rows.append(row)
+
+    states = dict(
+        db.query(Record.event_id, Record.state)
+        .filter(Record.event_id.in_([row["passId"] for row in rows]))
+        .all()
+    )
+    return [{**row, "state": states.get(row["passId"], "pending")} for row in rows]
+
+
+@app.post(
+    "/api/passes/{pass_id}/record",
+    response_model=RecordOut,
+    dependencies=[Depends(verify_session_token)],
+)
+def open_pass_record(pass_id: str, db: Session = Depends(get_db)):
+    record = get_pass(pass_id)
+    db.execute(
+        insert(Record).values(
+            event_id=pass_id,
+            demo_id=pass_id,
+            location=record["clip"]["id"],
+            confidence=0.0,
+            origin="simulated",
+            notice=SIMULATED_NOTICE,
+        ).on_conflict_do_nothing(index_elements=[Record.event_id])
+    )
+    result = db.query(Record).filter(Record.event_id == pass_id).one()
+    db.commit()
+    return result

@@ -257,3 +257,11 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - Changed `app/src/App.jsx`, `app/src/api/client.js`, `app/src/media/{RecordedPlayer.jsx,videoOverlay.js,WindshieldPanel.jsx}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `app/tests/vehicleSelection.test.js`, `backend/{main,crop_routes}.py`, `backend/tests/{test_crops_api,test_pass_promotion}.py` and this handoff.
 - The full backend suite passed 20 tests with one Starlette dependency deprecation warning. The Node hit-test passed and the Vite build succeeded. Chrome verified vehicle switching, playback, exact crop after seek, zoom, missing-crop display and manual flag retrieval. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-23-{candidate,not-assessable}.png`.
 - Manual flags reset when the backend restarts. Next, connect the Candidate list to the Pass selection and manual flag field during integration.
+
+## DemoSuite ticket #24
+
+- Reused the registry layout for the English Candidate list and translated the review console shell and live-camera page. The list uses bridge decisions or manual flags, shows labelled simulated scores, and opens the selected vehicle at its bridge frame.
+- Added an API route that opens a stable review Record for a Pass. The existing decision route saves the operator's review state and the list reflects it on return.
+- Changed `app/src/{App.jsx,api/client.js,media/RecordedPlayer.jsx,media/videoOverlay.js,pages/CaseDetail.jsx,pages/Dashboard.jsx,pages/recordStateLabels.js,styles.css}`, renamed `CamaraEnVivo.jsx` to `LiveCamera.jsx`, and changed `backend/{main,schemas,candidate_membership}.py`, `backend/tests/test_membership.py` and this handoff.
+- The full backend suite passed 23 tests with one Starlette deprecation warning. The Vite build passed. Real Chrome showed three Candidates and opened Cba002-068 at 48.12 seconds. All three review decisions persisted. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-24-*.png`.
+- The manual-flag API stores flags for the current backend process. During integration, use #23's durable flag source for membership and connect its open-Pass action to the same case entry point.

@@ -140,3 +140,11 @@ export async function getClipPlayback(clipId) {
   const playback = await fetchJSON(`/api/clips/${encodeURIComponent(clipId)}/playback`);
   return { ...playback, mediaUrl: new URL(playback.mediaPath, apiUrl).href };
 }
+
+export async function getCandidates() {
+  return fetchJSON("/api/candidates");
+}
+
+export async function openPassRecord(passId) {
+  return fetchJSON(`/api/passes/${encodeURIComponent(passId)}/record`, { method: "POST" });
+}
