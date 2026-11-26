@@ -74,3 +74,7 @@ checkpoints/
 .codex/
 .claude/
 .openclaw/
+
+# Local demo footage and generated crop strips
+*.mp4
+windshield-crops/

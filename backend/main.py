@@ -12,6 +12,7 @@ from sqlalchemy import func, inspect, text
 from sqlalchemy.orm import Session
 
 from clip_routes import create_clip_router
+from crop_routes import router as crop_router
 from database import Base, engine, get_db
 from models import Record, SIMULATED_NOTICE, TECHNICAL_NOTICE
 from pass_fixture import load_passes
@@ -126,6 +127,7 @@ def verify_session_token(
 
 
 app.include_router(create_clip_router(verify_session_token))
+app.include_router(crop_router, dependencies=[Depends(verify_session_token)])
 
 
 def is_valid_image_magic(data: bytes, content_type: str) -> bool:

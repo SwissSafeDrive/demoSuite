@@ -239,3 +239,13 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - The full backend suite passed all 14 tests. The Vite build passed. Real headless Chrome playback and seek passed for all three clips at two viewport sizes, with overlay alignment and changed pixels in the plate regions. The local API passed signed URL, HEAD and byte-range checks.
 - Open verification is the packaged WebView. The clip chooser is independent of the legacy records, and the blur uses only vehicles with saved fixture geometry.
 - Next action for the orchestrator is to take the ticket through review and verify native playback and visible plate blur in the macOS WebView during the Evidence stage.
+
+---
+
+## DemoSuite ticket #22
+
+- Added a local batch that blurs tracked plates before warping fixture windshield quads with the locked pad. It publishes a time-indexed JPEG strip or a Not assessable status for each Pass. Restored the slim tracker environment at `/workspace/wt/venv`.
+- Added the session-protected crop metadata and JPEG routes. Changed `.gitignore`, `backend/main.py`, `backend/fixtures/README.md` and this handoff. Added `backend/crop_storage.py`, `backend/crop_routes.py`, `backend/tests/test_crops_api.py` and `scripts/precompute_windshield_crops.py`.
+- `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 15 tests, including real bridge-frame fetches, geometry and unavailable crops. Starlette reported one dependency deprecation warning.
+- Verified 8,890 local JPEGs for 93 Passes and Not assessable entries for 38 Passes in `/workspace/demo-map/windshield-crops/`. All 131 metadata requests and the three Candidate bridge image requests passed. No ticket implementation issues remain.
+- Next action for the orchestrator is to integrate the signed ticket branch and use the crop routes for the side panel in #23.
