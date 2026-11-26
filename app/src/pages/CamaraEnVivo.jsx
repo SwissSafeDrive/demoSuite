@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { subirCaptura } from "../api/client";
+import { uploadCapture } from "../api/client";
 
 export default function CamaraEnVivo({ onVolver }) {
   const videoRef = useRef(null);
@@ -80,7 +80,7 @@ export default function CamaraEnVivo({ onVolver }) {
       async (blob) => {
         if (!blob) return;
         try {
-          const reg = await subirCaptura(blob, "Camera locale", 0.75);
+          const reg = await uploadCapture(blob);
           setUltimoRegistro(reg);
           setContador((c) => c + 1);
           setAvvisoStato("Frame registrato in locale.");
@@ -384,7 +384,7 @@ export default function CamaraEnVivo({ onVolver }) {
           {ultimoRegistro && (
             <div className="detalle-info-item">
               <strong>Ultimo ID</strong>
-              {ultimoRegistro.inf_id}
+              {ultimoRegistro.event_id}
             </div>
           )}
         </div>

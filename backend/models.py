@@ -1,25 +1,32 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text
-from datetime import datetime
+from datetime import UTC, datetime
 from database import Base
 
 
-class Registro(Base):
-    __tablename__ = "registros"
+TECHNICAL_NOTICE = (
+    "Preliminary technical event. A human operator reviews the evidence and makes the decision. "
+    "Privacy by Design — demonstration only. "
+    "Data is minimized for the demonstration. "
+    "Production encryption and retention policies require validation."
+)
+SIMULATED_NOTICE = (
+    "Simulated event for demonstration. "
+    "Privacy by Design. Data is minimized for the demonstration."
+)
+
+
+class Record(Base):
+    __tablename__ = "records"
 
     id = Column(Integer, primary_key=True, index=True)
-    inf_id = Column(String, unique=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
-    confianza = Column(Float)
-    ubicacion = Column(String)
-    identificatore_demo = Column(String, index=True)
-    imagen_path = Column(String, nullable=True)
-    estado = Column(String, default="pendiente")
-    agente_id = Column(String, nullable=True)
-    fecha_decision = Column(DateTime, nullable=True)
-    origen = Column(String, default="simulato")  # simulato | camara
-    nota_legal = Column(Text, default=(
-        "Evento tecnico preliminare. Non costituisce automaticamente prova. "
-        "Privacy by Design — demo non destinata a uso operativo. "
-        "Dati minimizzati nel contesto della dimostrazione. "
-        "Cifratura e politiche di conservazione produttive: POR VALIDAR."
-    ))
+    event_id = Column(String, unique=True, index=True)
+    timestamp = Column(DateTime, default=lambda: datetime.now(UTC), index=True)
+    confidence = Column(Float)
+    location = Column(String)
+    demo_id = Column(String, index=True)
+    image_path = Column(String, nullable=True)
+    state = Column(String, default="pending")
+    operator_id = Column(String, nullable=True)
+    decision_at = Column(DateTime, nullable=True)
+    origin = Column(String, default="simulated")  # simulated | camera
+    notice = Column(Text, default=TECHNICAL_NOTICE)

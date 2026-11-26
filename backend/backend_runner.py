@@ -1,5 +1,5 @@
 import atexit
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 import os
 import signal
 import threading
@@ -8,82 +8,67 @@ import time
 import uvicorn
 
 from database import SessionLocal
-from models import Registro
+from models import Record, SIMULATED_NOTICE
 import main
 
 
 def seed_demo_data():
-    main.ensure_schema()
     main.cleanup_temp_captures()
 
     db = SessionLocal()
 
     try:
         # Remove transient camera demo rows from previous sessions
-        db.query(Registro).filter(Registro.origen == "camara").delete()
+        db.query(Record).filter(Record.origin == "camera").delete()
         db.commit()
 
-        if db.query(Registro).count() > 0:
-            for idx, r in enumerate(db.query(Registro).all(), start=1):
-                r.identificatore_demo = f"demo-tech-{idx:03d}"
-                r.nota_legal = (
-                    "Evento simulato per dimostrazione. "
-                    "Non costituisce prova né infrazione reale. "
-                    "Privacy by Design — demo non destinata a uso operativo. "
-                    "Dati minimizzati nel contesto della dimostrazione."
-                )
-            db.commit()
+        if db.query(Record).count() > 0:
             return
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         demo_rows = [
             (
                 "demo_lugano_001",
                 now - timedelta(minutes=4),
                 0.92,
-                "Area urbana — Postazione demo A",
+                "Urban area — Demo station A",
                 "demo-tech-001",
             ),
             (
                 "demo_lugano_002",
                 now - timedelta(minutes=13),
                 0.87,
-                "Area urbana — Postazione demo B",
+                "Urban area — Demo station B",
                 "demo-tech-002",
             ),
             (
                 "demo_a2_003",
                 now - timedelta(minutes=27),
                 0.81,
-                "Asse principale — Postazione demo C",
+                "Main road — Demo station C",
                 "demo-tech-003",
             ),
             (
                 "demo_lugano_004",
                 now - timedelta(minutes=41),
                 0.76,
-                "Area urbana — Postazione demo D",
+                "Urban area — Demo station D",
                 "demo-tech-004",
             ),
         ]
 
-        for inf_id, timestamp, confidence, location, demo_id in demo_rows:
+        for event_id, timestamp, confidence, location, demo_id in demo_rows:
             db.add(
-                Registro(
-                    inf_id=inf_id,
+                Record(
+                    event_id=event_id,
                     timestamp=timestamp,
-                    confianza=confidence,
-                    ubicacion=location,
-                    identificatore_demo=demo_id,
-                    estado="pendiente",
-                    origen="simulato",
-                    nota_legal=(
-                        "Evento simulato per dimostrazione. "
-                        "Non costituisce prova né infrazione reale. "
-                        "Privacy by Design — demo non destinata a uso operativo. "
-                        "Dati minimizzati nel contesto della dimostrazione."
-                    ),
+                    confidence=confidence,
+                    location=location,
+                    demo_id=demo_id,
+                    state="pending",
+                    origin="simulated",
+                    notice=SIMULATED_NOTICE,
                 )
             )
 

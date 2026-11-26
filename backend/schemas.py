@@ -1,38 +1,37 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
 
-class RegistroBase(BaseModel):
-    inf_id: str
+class RecordBase(BaseModel):
+    event_id: str
     timestamp: datetime
-    confianza: float
-    ubicacion: str
-    identificatore_demo: Optional[str] = None
-    estado: str
-    origen: str = "simulato"
-    nota_legal: str
+    confidence: float
+    location: str
+    demo_id: Optional[str] = None
+    state: str
+    origin: str = "simulated"
+    notice: str
 
 
-class RegistroOut(RegistroBase):
+class RecordOut(RecordBase):
     id: int
-    imagen_path: Optional[str] = None
-    agente_id: Optional[str] = None
-    fecha_decision: Optional[datetime] = None
+    image_path: Optional[str] = None
+    operator_id: Optional[str] = None
+    decision_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DecisionIn(BaseModel):
-    estado: str
-    agente_id: Optional[str] = "agente_demo"
+    state: str
+    operator_id: Optional[str] = "demo_operator"
 
 
-class EstadisticasOut(BaseModel):
+class StatisticsOut(BaseModel):
     total: int
-    pendientes: int
-    revisados: int
-    confirmados: int
-    descartados: int
-    confianza_media: float
+    pending: int
+    reviewed: int
+    confirmed: int
+    discarded: int
+    average_confidence: float

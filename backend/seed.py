@@ -1,39 +1,41 @@
-from datetime import datetime, timedelta
-from database import SessionLocal, engine, Base
-from models import Registro
+from datetime import UTC, datetime, timedelta
+from database import SessionLocal
+from main import ensure_schema
+from models import Record, SIMULATED_NOTICE
 
 
 def seed():
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
     db = SessionLocal()
 
-    if db.query(Registro).count() > 0:
-        print("Database già popolato. Skip.")
+    if db.query(Record).count() > 0:
+        print("Database already seeded.")
         db.close()
         return
 
-    ahora = datetime.utcnow()
-    registros = [
-        {"confianza": 0.94, "ubicacion": "Area urbana — Postazione demo 1", "offset": 0},
-        {"confianza": 0.87, "ubicacion": "Area urbana — Postazione demo 2", "offset": 15},
-        {"confianza": 0.76, "ubicacion": "Area urbana — Postazione demo 3", "offset": 31},
-        {"confianza": 0.91, "ubicacion": "Area urbana — Postazione demo 4", "offset": 42},
+    now = datetime.now(UTC)
+    records = [
+        {"confidence": 0.94, "location": "Urban area — Demo station 1", "offset": 0},
+        {"confidence": 0.87, "location": "Urban area — Demo station 2", "offset": 15},
+        {"confidence": 0.76, "location": "Urban area — Demo station 3", "offset": 31},
+        {"confidence": 0.91, "location": "Urban area — Demo station 4", "offset": 42},
     ]
 
-    for i, r in enumerate(registros, start=1):
-        reg = Registro(
-            inf_id=f"inf_seed_{i:03d}",
-            timestamp=ahora + timedelta(minutes=r["offset"]),
-            confianza=r["confianza"],
-            ubicacion=r["ubicacion"],
-            identificatore_demo=f"demo-tech-{i:03d}",
-            estado="pendiente",
-            origen="simulato",
+    for i, r in enumerate(records, start=1):
+        record = Record(
+            event_id=f"inf_seed_{i:03d}",
+            timestamp=now + timedelta(minutes=r["offset"]),
+            confidence=r["confidence"],
+            location=r["location"],
+            demo_id=f"demo-tech-{i:03d}",
+            state="pending",
+            origin="simulated",
+            notice=SIMULATED_NOTICE,
         )
-        db.add(reg)
+        db.add(record)
 
     db.commit()
-    print(f"Inseriti {len(registros)} registri di prova.")
+    print(f"Inserted {len(records)} demo records.")
     db.close()
 
 

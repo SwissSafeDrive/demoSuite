@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { tomarDecision, fetchImagenBlobUrl } from "../api/client";
+import { submitDecision, fetchImageBlobUrl } from "../api/client";
+import { recordStateLabels } from "./recordStateLabels";
 
 export default function RegistroDetalle({ registro, onVolver }) {
-  const [estado, setEstado] = useState(registro.estado);
+  const [estado, setEstado] = useState(registro.state);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
   const [error, setError] = useState(null);
   const [imagenUrl, setImagenUrl] = useState(null);
 
-  const tieneImagen = !!registro.imagen_path;
+  const tieneImagen = !!registro.image_path;
 
   useEffect(() => {
     let activeUrl = null;
     let cancelado = false;
 
     if (tieneImagen) {
-      fetchImagenBlobUrl(registro.id)
+      fetchImageBlobUrl(registro.id)
         .then((url) => {
           if (cancelado) {
             URL.revokeObjectURL(url);
@@ -62,9 +63,9 @@ export default function RegistroDetalle({ registro, onVolver }) {
     setError(null);
     setMensaje(null);
     try {
-      const actualizado = await tomarDecision(registro.id, nuevoEstado);
-      setEstado(actualizado.estado);
-      setMensaje(`Decisione registrata: ${nuevoEstado}`);
+      const actualizado = await submitDecision(registro.id, nuevoEstado);
+      setEstado(actualizado.state);
+      setMensaje(`Decisione registrata: ${recordStateLabels[nuevoEstado]}`);
     } catch (e) {
       setError(`Impossibile aggiornare la decisione: ${e.message}`);
     } finally {
@@ -99,7 +100,7 @@ export default function RegistroDetalle({ registro, onVolver }) {
         <div className="detalle-info-grid">
           <div className="detalle-info-item">
             <strong>ID registro</strong>
-            {registro.inf_id}
+            {registro.event_id}
           </div>
           <div className="detalle-info-item">
             <strong>Data e ora</strong>
@@ -107,45 +108,45 @@ export default function RegistroDetalle({ registro, onVolver }) {
           </div>
           <div className="detalle-info-item">
             <strong>Luogo</strong>
-            {registro.ubicacion}
+            {registro.location}
           </div>
           <div className="detalle-info-item">
             <strong>Origine</strong>
-            {registro.origen === "camara" ? "📷 Camera" : "🧪 Simulato"}
+            {registro.origin === "camera" ? "📷 Camera" : "🧪 Simulato"}
           </div>
           <div className="detalle-info-item">
             <strong>Confidenza IA</strong>
             <span
-              className={`registro-card-badge ${getBadgeClass(registro.confianza)}`}
+              className={`registro-card-badge ${getBadgeClass(registro.confidence)}`}
               style={{
                 position: "static",
                 display: "inline-block",
                 marginTop: "4px",
               }}
             >
-              {(registro.confianza * 100).toFixed(1)}%
+              {(registro.confidence * 100).toFixed(1)}%
             </span>
           </div>
           <div className="detalle-info-item">
             <strong>Identificatore tecnico demo</strong>
-            {registro.identificatore_demo || registro.inf_id}
+            {registro.demo_id || registro.event_id}
           </div>
           <div className="detalle-info-item">
             <strong>Stato attuale</strong>
             <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
-              {estado}
+              {recordStateLabels[estado]}
             </span>
           </div>
-          {registro.agente_id && (
+          {registro.operator_id && (
             <div className="detalle-info-item">
               <strong>Agente</strong>
-              {registro.agente_id}
+              {registro.operator_id}
             </div>
           )}
-          {registro.fecha_decision && (
+          {registro.decision_at && (
             <div className="detalle-info-item">
               <strong>Data decisione</strong>
-              {formatFecha(registro.fecha_decision)}
+              {formatFecha(registro.decision_at)}
             </div>
           )}
         </div>
@@ -173,21 +174,21 @@ export default function RegistroDetalle({ registro, onVolver }) {
         <div className="detalle-acciones">
           <button
             className="btn-descartar"
-            onClick={() => enviarDecision("descartado")}
+            onClick={() => enviarDecision("discarded")}
             disabled={guardando}
           >
             {guardando ? "…" : "Scarta"}
           </button>
           <button
             className="btn-revisar"
-            onClick={() => enviarDecision("revisado")}
+            onClick={() => enviarDecision("reviewed")}
             disabled={guardando}
           >
             {guardando ? "…" : "Marca per revisione"}
           </button>
           <button
             className="btn-confirmar"
-            onClick={() => enviarDecision("confirmado")}
+            onClick={() => enviarDecision("confirmed")}
             disabled={guardando}
           >
             {guardando ? "…" : "Conferma infrazione"}
@@ -196,7 +197,7 @@ export default function RegistroDetalle({ registro, onVolver }) {
       </div>
 
       <div className="detalle-nota">
-        <strong>Nota informativa:</strong> {registro.nota_legal}
+        <strong>Nota informativa:</strong> {registro.notice}
       </div>
     </div>
   );
