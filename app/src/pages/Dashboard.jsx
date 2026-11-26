@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { getRegistros, getEstadisticas } from "../api/client";
+import { getRecords, getStatistics } from "../api/client";
+import { recordStateLabels } from "./recordStateLabels";
 
 export default function Dashboard({ onAbrirRegistro }) {
   const [registros, setRegistros] = useState([]);
@@ -16,8 +17,8 @@ export default function Dashboard({ onAbrirRegistro }) {
     setError(null);
     try {
       const [regs, stats] = await Promise.all([
-        getRegistros(),
-        getEstadisticas(),
+        getRecords(),
+        getStatistics(),
       ]);
       setRegistros(regs);
       setEstadisticas(stats);
@@ -34,12 +35,12 @@ export default function Dashboard({ onAbrirRegistro }) {
 
   const registrosFiltrados = useMemo(() => {
     return registros.filter((r) => {
-      if (filtroEstado !== "todos" && r.estado !== filtroEstado) return false;
-      if (r.confianza < filtroConfianza) return false;
+      if (filtroEstado !== "todos" && r.state !== filtroEstado) return false;
+      if (r.confidence < filtroConfianza) return false;
       if (
         filtroBusqueda &&
-        !r.ubicacion.toLowerCase().includes(filtroBusqueda.toLowerCase()) &&
-        !r.inf_id.toLowerCase().includes(filtroBusqueda.toLowerCase())
+        !r.location.toLowerCase().includes(filtroBusqueda.toLowerCase()) &&
+        !r.event_id.toLowerCase().includes(filtroBusqueda.toLowerCase())
       )
         return false;
       return true;
@@ -117,16 +118,16 @@ export default function Dashboard({ onAbrirRegistro }) {
           </div>
           <div className="stat-card">
             <h3>Pendenti</h3>
-            <p className="stat-num">{estadisticas.pendientes}</p>
+            <p className="stat-num">{estadisticas.pending}</p>
           </div>
           <div className="stat-card">
             <h3>Revisati</h3>
-            <p className="stat-num">{estadisticas.revisados}</p>
+            <p className="stat-num">{estadisticas.reviewed}</p>
           </div>
           <div className="stat-card">
             <h3>Confidenza media</h3>
             <p className="stat-num">
-              {(estadisticas.confianza_media * 100).toFixed(1)}%
+              {(estadisticas.average_confidence * 100).toFixed(1)}%
             </p>
           </div>
         </div>
@@ -140,10 +141,10 @@ export default function Dashboard({ onAbrirRegistro }) {
             onChange={(e) => setFiltroEstado(e.target.value)}
           >
             <option value="todos">Tutti</option>
-            <option value="pendiente">Pendente</option>
-            <option value="revisado">Revisato</option>
-            <option value="confirmado">Confermato</option>
-            <option value="descartado">Scartato</option>
+            <option value="pending">Pendente</option>
+            <option value="reviewed">Revisato</option>
+            <option value="confirmed">Confermato</option>
+            <option value="discarded">Scartato</option>
           </select>
         </label>
 
@@ -196,18 +197,18 @@ export default function Dashboard({ onAbrirRegistro }) {
             >
               <div className="registro-card-imagen">
                 <span>Immagine evento — demo</span>
-                <span className={`registro-card-badge ${getBadgeClass(r.confianza)}`}>
-                  {(r.confianza * 100).toFixed(0)}%
+                <span className={`registro-card-badge ${getBadgeClass(r.confidence)}`}>
+                  {(r.confidence * 100).toFixed(0)}%
                 </span>
               </div>
               <div className="registro-card-info">
-                <h4>{r.ubicacion}</h4>
+                <h4>{r.location}</h4>
                 <p>{formatFecha(r.timestamp)}</p>
                 <p>
-                  Stato: <strong>{r.estado}</strong>
+                  Stato: <strong>{recordStateLabels[r.state]}</strong>
                 </p>
                 <p className="confianza">
-                  Confidenza: {(r.confianza * 100).toFixed(1)}%
+                  Confidenza: {(r.confidence * 100).toFixed(1)}%
                 </p>
               </div>
             </div>

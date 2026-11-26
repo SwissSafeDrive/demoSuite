@@ -31,7 +31,7 @@ async function getSessionConfig() {
   }
   return {
     apiUrl: "http://127.0.0.1:8765",
-    sessionToken: "",
+    sessionToken: import.meta.env.DEV ? import.meta.env.VITE_SSD_SESSION_TOKEN || "" : "",
   };
 }
 
@@ -50,72 +50,76 @@ async function fetchJSON(path, options = {}) {
     headers,
   });
   if (!res.ok) {
-    throw new Error(`Errore API: ${res.status} ${res.statusText}`);
+    throw new Error(`API error: ${res.status} ${res.statusText}`);
   }
   return res.json();
 }
 
-export async function getRegistros() {
-  return fetchJSON("/api/registros");
+export async function getRecords() {
+  return fetchJSON("/api/records");
 }
 
-export async function getEstadisticas() {
-  return fetchJSON("/api/estadisticas");
+export async function getStatistics() {
+  return fetchJSON("/api/statistics");
 }
 
-export async function getRegistro(id) {
-  return fetchJSON(`/api/registros/${id}`);
+export async function getRecord(id) {
+  return fetchJSON(`/api/records/${id}`);
 }
 
-export async function tomarDecision(id, estado, agenteId = "agente_demo") {
-  return fetchJSON(`/api/registros/${id}/decision`, {
+export async function submitDecision(id, state, operatorId = "demo_operator") {
+  return fetchJSON(`/api/records/${id}/decision`, {
     method: "PATCH",
-    body: JSON.stringify({ estado, agente_id: agenteId }),
+    body: JSON.stringify({ state, operator_id: operatorId }),
   });
 }
 
-export async function subirCaptura(
+export async function uploadCapture(
   blob,
-  ubicacion = "Camera locale",
-  confianza = 0.75
+  location = "Local camera",
+  confidence = 0.75
 ) {
   const { apiUrl, sessionToken } = await getSessionConfig();
   const formData = new FormData();
   formData.append("file", blob, "frame.jpg");
-  formData.append("ubicacion", ubicacion);
-  formData.append("confianza", confianza.toString());
+  formData.append("location", location);
+  formData.append("confidence", confidence.toString());
 
   const headers = {};
   if (sessionToken) {
     headers["X-SSD-Session"] = sessionToken;
   }
 
-  const res = await fetch(`${apiUrl}/api/capturas/upload`, {
+  const res = await fetch(`${apiUrl}/api/captures/upload`, {
     method: "POST",
     headers,
     body: formData,
   });
 
   if (!res.ok) {
-    throw new Error(`Errore upload: ${res.status} ${res.statusText}`);
+    throw new Error(`Upload error: ${res.status} ${res.statusText}`);
   }
   return res.json();
 }
 
-export async function fetchImagenBlobUrl(registroId) {
+export async function fetchImageBlobUrl(recordId) {
   const { apiUrl, sessionToken } = await getSessionConfig();
   const headers = {};
   if (sessionToken) {
     headers["X-SSD-Session"] = sessionToken;
   }
 
-  const res = await fetch(`${apiUrl}/api/imagenes/${registroId}`, {
+  const res = await fetch(`${apiUrl}/api/images/${recordId}`, {
     method: "GET",
     headers,
   });
   if (!res.ok) {
-    throw new Error(`Immagine non disponibile (${res.status})`);
+    throw new Error(`Image unavailable (${res.status})`);
   }
   const blob = await res.blob();
   return URL.createObjectURL(blob);
+}
+
+export async function getPass(id) {
+  return fetchJSON(`/api/passes/${encodeURIComponent(id)}`);
 }

@@ -221,3 +221,13 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 
 ### Siguiente acción recomendada
 - Utilizar `/Users/david/Desktop/SwissSafeDrive_Demo_FINAL/SwissSafeDrive.app` o `/Users/david/Desktop/SwissSafeDrive_Demo_FINAL/SwissSafeDrive_0.2.2_aarch64.dmg` para la demostración institucional.
+
+---
+
+## DemoSuite ticket #21
+
+- Exported 131 Passes with saved vehicle geometry, bridge Snapshots and three labelled simulated Candidates. Added local footage lookup, protected Pass routes, English record routes and a Vite browser session token.
+- Updated `app/README.md`, `app/src/api/client.js`, `app/src/pages/{CamaraEnVivo,Dashboard,RegistroDetalle}.jsx` and `app/src/pages/recordStateLabels.js`. Backend changes cover `backend/{main,models,schemas,backend_runner,seed,pass_fixture}.py`, `backend/fixtures/` and `backend/tests/`. Added `scripts/build_pass_fixture.py` and `scripts/locate_footage.py`.
+- `python -m pytest backend/tests` passed all 11 tests. The Vite production build passed. Headless Chrome loaded the registry against the local runner and saved a decision on a migrated 0.2.2 record. Capture upload, image retrieval and all three local clip lookups passed.
+- The fixture uses bridge frames 927 and 1051 for the second and third Candidates because the tracker-selected frames occur after the v5 windshield leaves view. The fixture README records the source frames and substitution.
+- Next action for the orchestrator is to integrate the signed ticket branch before starting the recorded-video player and crop batch. No outstanding ticket #21 implementation work.
