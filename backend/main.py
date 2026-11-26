@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import func, inspect, text
 from sqlalchemy.orm import Session
 
+from clip_routes import create_clip_router
 from database import Base, engine, get_db
 from models import Record, SIMULATED_NOTICE, TECHNICAL_NOTICE
 from pass_fixture import load_passes
@@ -108,7 +109,7 @@ app.add_middleware(
     ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-    allow_headers=["Content-Type", "X-SSD-Session"],
+    allow_headers=["Content-Type", "X-SSD-Session", "Range"],
 )
 
 
@@ -122,6 +123,9 @@ def verify_session_token(
             status_code=401,
             detail="Unauthorized session",
         )
+
+
+app.include_router(create_clip_router(verify_session_token))
 
 
 def is_valid_image_magic(data: bytes, content_type: str) -> bool:

@@ -231,3 +231,11 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - `python -m pytest backend/tests` passed all 11 tests. The Vite production build passed. Headless Chrome loaded the registry against the local runner and saved a decision on a migrated 0.2.2 record. Capture upload, image retrieval and all three local clip lookups passed.
 - The fixture uses bridge frames 927 and 1051 for the second and third Candidates because the tracker-selected frames occur after the v5 windshield leaves view. The fixture README records the source frames and substitution.
 - Next action for the orchestrator is to integrate the signed ticket branch before starting the recorded-video player and crop batch. No outstanding ticket #21 implementation work.
+
+## DemoSuite ticket #20
+
+- Added native recorded playback, a clip chooser in the simulated case detail, frame-synced vehicle and windshield overlays, labelled simulated confidence, and a lower-front pixel blur for tracked vehicles. Local playback uses clip-scoped signed URLs and byte ranges.
+- Updated `app/src/{App.jsx,api/client.js,styles.css,pages/CaseDetail.jsx,pages/CamaraEnVivo.jsx,media/RecordedPlayer.jsx,media/videoOverlay.js}` and `app/src-tauri/tauri.conf.json`. Renamed `RegistroDetalle.jsx` to `CaseDetail.jsx`. Updated `backend/{main,clip_routes,footage,overlay}.py`, `backend/tests/test_overlay.py`, and `scripts/locate_footage.py`.
+- The full backend suite passed all 14 tests. The Vite build passed. Real headless Chrome playback and seek passed for all three clips at two viewport sizes, with overlay alignment and changed pixels in the plate regions. The local API passed signed URL, HEAD and byte-range checks.
+- Open verification is the packaged WebView. The clip chooser is independent of the legacy records, and the blur uses only vehicles with saved fixture geometry.
+- Next action for the orchestrator is to take the ticket through review and verify native playback and visible plate blur in the macOS WebView during the Evidence stage.

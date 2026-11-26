@@ -109,8 +109,8 @@ export default function CamaraEnVivo({ onVolver }) {
   };
 
   return (
-    <div className="detalle-container">
-      <div className="detalle-header">
+    <div className="case-detail-container">
+      <div className="case-detail-header">
         <button onClick={onVolver}>← Torna all'elenco</button>
         <h2>Camera in diretta</h2>
       </div>
@@ -243,7 +243,7 @@ export default function CamaraEnVivo({ onVolver }) {
 
       <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      <div className="detalle-info">
+      <div className="case-detail-info">
         <h3>Controlli</h3>
         <div
           style={{
@@ -364,25 +364,25 @@ export default function CamaraEnVivo({ onVolver }) {
         </div>
       </div>
 
-      <div className="detalle-info">
+      <div className="case-detail-info">
         <h3>Statistiche sessione</h3>
-        <div className="detalle-info-grid">
-          <div className="detalle-info-item">
+        <div className="case-detail-info-grid">
+          <div className="case-detail-info-item">
             <strong>Frame inviati</strong>
             {contador}
           </div>
-          <div className="detalle-info-item">
+          <div className="case-detail-info-item">
             <strong>Stato camera</strong>
             {activa
               ? "Camera reale attiva"
               : "MODALITÀ DEMO — NESSUNA CAMERA COLLEGATA"}
           </div>
-          <div className="detalle-info-item">
+          <div className="case-detail-info-item">
             <strong>Cattura automatica</strong>
             {autoCaptura ? `Ogni ${intervaloSeg}s` : "Disattivata"}
           </div>
           {ultimoRegistro && (
-            <div className="detalle-info-item">
+            <div className="case-detail-info-item">
               <strong>Ultimo ID</strong>
               {ultimoRegistro.event_id}
             </div>
@@ -390,7 +390,7 @@ export default function CamaraEnVivo({ onVolver }) {
         </div>
       </div>
 
-      <div className="detalle-nota">
+      <div className="case-detail-note">
         <strong>Nota informativa:</strong> Privacy by Design — demo non destinata
         a uso operativo · Dati minimizzati nel contesto della dimostrazione. Le
         acquisizioni temporanee della sessione vengono rimosse alla chiusura.

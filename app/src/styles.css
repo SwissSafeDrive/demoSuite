@@ -225,19 +225,19 @@ body {
   font-weight: 600;
 }
 
-.detalle-container {
+.case-detail-container {
   max-width: 900px;
   margin: 0 auto;
 }
 
-.detalle-header {
+.case-detail-header {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.detalle-header button {
+.case-detail-header button {
   padding: 8px 16px;
   background: #e5e7eb;
   color: #374151;
@@ -247,15 +247,15 @@ body {
   font-size: 0.9rem;
 }
 
-.detalle-header button:hover {
+.case-detail-header button:hover {
   background: #d1d5db;
 }
 
-.detalle-header h2 {
+.case-detail-header h2 {
   font-size: 1.3rem;
 }
 
-.detalle-imagen {
+.case-detail-image {
   background: white;
   border-radius: 8px;
   overflow: hidden;
@@ -263,19 +263,19 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.detalle-imagen img {
+.case-detail-image img {
   width: 100%;
   display: block;
 }
 
-.detalle-imagen-placeholder {
+.case-detail-image-placeholder {
   padding: 60px;
   text-align: center;
   color: #9ca3af;
   background: #f3f4f6;
 }
 
-.detalle-info {
+.case-detail-info {
   background: white;
   border-radius: 8px;
   padding: 20px;
@@ -283,23 +283,23 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.detalle-info h3 {
+.case-detail-info h3 {
   font-size: 1rem;
   margin-bottom: 12px;
   color: #111827;
 }
 
-.detalle-info-grid {
+.case-detail-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 
-.detalle-info-item {
+.case-detail-info-item {
   font-size: 0.85rem;
 }
 
-.detalle-info-item strong {
+.case-detail-info-item strong {
   display: block;
   color: #6b7280;
   font-size: 0.75rem;
@@ -308,13 +308,13 @@ body {
   margin-bottom: 2px;
 }
 
-.detalle-acciones {
+.case-detail-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-.detalle-acciones button {
+.case-detail-actions button {
   flex: 1;
   padding: 12px 20px;
   border: none;
@@ -325,7 +325,7 @@ body {
   transition: opacity 0.15s;
 }
 
-.detalle-acciones button:hover {
+.case-detail-actions button:hover {
   opacity: 0.9;
 }
 
@@ -344,7 +344,7 @@ body {
   color: white;
 }
 
-.detalle-nota {
+.case-detail-note {
   margin-top: 20px;
   padding: 12px;
   background: #fef3c7;
@@ -386,14 +386,14 @@ body {
 }
 
 /* Imagen real del registro */
-.detalle-imagen-real {
+.case-detail-capture {
   background: black;
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 20px;
 }
 
-.detalle-imagen-real img {
+.case-detail-capture img {
   width: 100%;
   display: block;
 }
@@ -402,4 +402,39 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.case-detail-footage {
+  margin-bottom: 24px;
+}
+
+.case-detail-footage label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.recorded-player {
+  position: relative;
+  background: #0f1318;
+}
+
+.recorded-player video {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 55vh, 620px);
+  object-fit: contain;
+}
+
+.recorded-player video::-webkit-media-controls-fullscreen-button {
+  display: none;
+}
+
+.recorded-player canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
