@@ -28,3 +28,20 @@ Regenerate the export with `python scripts/build_pass_fixture.py`. This reads
 the saved track CSVs, Pass metadata, windshield rule and v5 renderer from
 `/workspace/demo-map` (override with `--demo-map`). Regeneration requires NumPy,
 OpenCV and Pillow. The local API reads the exported JSON with its normal dependencies.
+
+## Local windshield crop strips
+
+Run `/workspace/wt/venv/bin/python scripts/precompute_windshield_crops.py` from
+the repo root. The slim environment needs NumPy, OpenCV headless and Pillow.
+The script uses the locked warp in `/workspace/demo-map/overlay_v2/` and blurs
+tracked plates on the source frames. It writes JPEGs and `index.json` to
+`/workspace/demo-map/windshield-crops/` by default. Set `SSD_CROP_DIR` for both
+the generator and backend to use a different local directory.
+
+`GET /api/passes/{passId}/crops` returns the crop status and ordered entries
+with source frame, video time in seconds and an image URL. Match entries to
+the source frame at the current playback time. Missing frames have no usable
+crop. `Not assessable` Passes have an empty frame list. Each image is served
+at `GET /api/passes/{passId}/crops/{frame}`. Both routes use the existing
+`X-SSD-Session` header. Rebuilding publishes a new complete index and keeps
+the previous image generation available to requests already in flight.

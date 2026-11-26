@@ -231,3 +231,13 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - `python -m pytest backend/tests` passed all 11 tests. The Vite production build passed. Headless Chrome loaded the registry against the local runner and saved a decision on a migrated 0.2.2 record. Capture upload, image retrieval and all three local clip lookups passed.
 - The fixture uses bridge frames 927 and 1051 for the second and third Candidates because the tracker-selected frames occur after the v5 windshield leaves view. The fixture README records the source frames and substitution.
 - Next action for the orchestrator is to integrate the signed ticket branch before starting the recorded-video player and crop batch. No outstanding ticket #21 implementation work.
+
+---
+
+## DemoSuite ticket #22
+
+- Added a local batch that blurs tracked plates before warping fixture windshield quads with the locked pad. It publishes a time-indexed JPEG strip or a Not assessable status for each Pass. Restored the slim tracker environment at `/workspace/wt/venv`.
+- Added the session-protected crop metadata and JPEG routes. Changed `.gitignore`, `backend/main.py`, `backend/fixtures/README.md` and this handoff. Added `backend/crop_storage.py`, `backend/crop_routes.py`, `backend/tests/test_crops_api.py` and `scripts/precompute_windshield_crops.py`.
+- `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 15 tests, including real bridge-frame fetches, geometry and unavailable crops. Starlette reported one dependency deprecation warning.
+- Verified 8,890 local JPEGs for 93 Passes and Not assessable entries for 38 Passes in `/workspace/demo-map/windshield-crops/`. All 131 metadata requests and the three Candidate bridge image requests passed. No ticket implementation issues remain.
+- Next action for the orchestrator is to integrate the signed ticket branch and use the crop routes for the side panel in #23.
