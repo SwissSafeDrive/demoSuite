@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 import os
 import secrets
 import uuid
@@ -8,6 +8,7 @@ import uuid
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 from sqlalchemy import func, inspect, text
 from sqlalchemy.orm import Session
 
@@ -347,10 +348,23 @@ def get_image(record_id: int, db: Session = Depends(get_db)):
     return FileResponse(filepath, media_type="image/jpeg")
 
 
+class ManualFlagIn(BaseModel):
+    flagged_manually: Literal[True]
+
+
+manual_flags: set[str] = set()
+
+
+def with_manual_flag(record):
+    if record["passId"] in manual_flags:
+        return {**record, "flagged_manually": True}
+    return record
+
+
 @app.get("/api/passes", dependencies=[Depends(verify_session_token)])
 def list_passes(clip: str | None = None, track_id: int | None = None):
     return [
-        record for record in load_passes().values()
+        with_manual_flag(record) for record in load_passes().values()
         if (clip is None or record["clip"]["id"] == clip)
         and (track_id is None or track_id in record["track_ids"])
     ]
@@ -361,4 +375,11 @@ def get_pass(pass_id: str):
     record = load_passes().get(pass_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Pass not found")
-    return record
+    return with_manual_flag(record)
+
+
+@app.patch("/api/passes/{pass_id}", dependencies=[Depends(verify_session_token)])
+def flag_pass(pass_id: str, body: ManualFlagIn):
+    record = get_pass(pass_id)
+    manual_flags.add(pass_id)
+    return with_manual_flag(record)

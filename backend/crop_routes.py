@@ -30,7 +30,7 @@ def crop_entry(pass_id):
     except FileNotFoundError:
         entry = None
     if entry is None:
-        raise HTTPException(404, "Crop index entry not found")
+        entry = {"status": "Not assessable", "frames": {}}
     return record, entry
 
 

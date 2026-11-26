@@ -102,22 +102,33 @@ export async function uploadCapture(
   return res.json();
 }
 
-export async function fetchImageBlobUrl(recordId) {
+async function fetchImageBlob(path, signal) {
   const { apiUrl, sessionToken } = await getSessionConfig();
-  const headers = {};
-  if (sessionToken) {
-    headers["X-SSD-Session"] = sessionToken;
-  }
-
-  const res = await fetch(`${apiUrl}/api/images/${recordId}`, {
-    method: "GET",
-    headers,
-  });
+  const headers = sessionToken ? { "X-SSD-Session": sessionToken } : {};
+  const res = await fetch(`${apiUrl}${path}`, { headers, signal });
   if (!res.ok) {
     throw new Error(`Image unavailable (${res.status})`);
   }
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
+  return res.blob();
+}
+
+export async function fetchImageBlobUrl(recordId) {
+  return URL.createObjectURL(await fetchImageBlob(`/api/images/${recordId}`));
+}
+
+export function getPassCrops(id) {
+  return fetchJSON(`/api/passes/${encodeURIComponent(id)}/crops`);
+}
+
+export function fetchWindshieldCrop(path, signal) {
+  return fetchImageBlob(path, signal);
+}
+
+export function flagPass(id) {
+  return fetchJSON(`/api/passes/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ flagged_manually: true }),
+  });
 }
 
 export async function getPass(id) {

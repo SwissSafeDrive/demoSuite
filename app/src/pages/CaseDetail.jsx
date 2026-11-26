@@ -3,7 +3,30 @@ import { submitDecision, fetchImageBlobUrl } from "../api/client";
 import RecordedPlayer from "../media/RecordedPlayer";
 import { recordStateLabels } from "./recordStateLabels";
 
-export default function CaseDetail({ record, onBack }) {
+export default function CaseDetail({ record, selection, onOpenPass, onClearPass, onBack }) {
+  const hasFootage = !record || (record.origin === "simulated" && !record.image_path);
+  const backToRecord = selection && record;
+  return (
+    <div className={selection ? "case-detail-container single-case-analysis" : "case-detail-container"}>
+      <div className="case-detail-header">
+        <button onClick={backToRecord ? onClearPass : onBack}>
+          {backToRecord ? "← Back to record" : "← Back to records"}
+        </button>
+        <h2>{selection ? "Single Case Analysis" : "Case detail"}</h2>
+      </div>
+      {hasFootage && (
+        <RecordedPlayer selection={selection} onOpenPass={onOpenPass} onClearPass={onClearPass} />
+      )}
+      {record && (
+        <div hidden={Boolean(selection)}>
+          <RecordDetail key={record.id} record={record} hasFootage={hasFootage} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RecordDetail({ record, hasFootage }) {
   const [state, setState] = useState(record.state);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -75,15 +98,8 @@ export default function CaseDetail({ record, onBack }) {
   };
 
   return (
-    <div className="case-detail-container">
-      <div className="case-detail-header">
-        <button onClick={onBack}>← Back to records</button>
-        <h2>Case detail</h2>
-      </div>
-
-      {record.origin === "simulated" && !hasImage ? (
-        <RecordedPlayer />
-      ) : hasImage && imageUrl ? (
+    <>
+      {hasFootage ? null : hasImage && imageUrl ? (
         <div className="case-detail-capture">
           <img src={imageUrl} alt="Captured image" />
         </div>
@@ -202,6 +218,6 @@ export default function CaseDetail({ record, onBack }) {
       <div className="case-detail-note">
         <strong>Nota informativa:</strong> {record.notice}
       </div>
-    </div>
+    </>
   );
 }

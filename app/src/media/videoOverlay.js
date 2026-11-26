@@ -52,6 +52,42 @@ function blurPlate(context, video, sample, box, clip) {
   context.drawImage(sample.canvas, left, top, width, height);
 }
 
+export function frameAtTime(time, fps) {
+  return Math.floor(time * fps + 1e-7);
+}
+
+function videoProjection(viewport, source, clip) {
+  const scale = Math.min(viewport.width / source.width, viewport.height / source.height);
+  const width = source.width * scale;
+  const height = source.height * scale;
+  return {
+    left: (viewport.width - width) / 2,
+    top: (viewport.height - height) / 2,
+    scaleX: width / clip.width,
+    scaleY: height / clip.height,
+  };
+}
+
+export function vehicleAtPoint(playback, time, viewport, source, x, y) {
+  const { clip, frames } = playback;
+  const { left, top, scaleX, scaleY } = videoProjection(viewport, source, clip);
+  const sourceX = (x - left) / scaleX;
+  const sourceY = (y - top) / scaleY;
+  if (sourceX < 0 || sourceX > clip.width || sourceY < 0 || sourceY > clip.height) return null;
+
+  let hit = null;
+  let smallestArea = Infinity;
+  for (const { passId, box: [x1, y1, x2, y2] } of frames[frameAtTime(time, clip.fps)] ?? []) {
+    if (sourceX < x1 || sourceX > x2 || sourceY < y1 || sourceY > y2) continue;
+    const area = (x2 - x1) * (y2 - y1);
+    if (area < smallestArea) {
+      hit = passId;
+      smallestArea = area;
+    }
+  }
+  return hit;
+}
+
 export function drawVideoOverlay(canvas, video, sample, playback, time) {
   const context = canvas.getContext("2d");
   const width = Math.round(canvas.clientWidth * window.devicePixelRatio);
@@ -63,16 +99,14 @@ export function drawVideoOverlay(canvas, video, sample, playback, time) {
   if (!width || !height || !video.videoWidth || video.readyState < 2) return;
 
   const { clip, frames } = playback;
-  const videoScale = Math.min(width / video.videoWidth, height / video.videoHeight);
-  const visibleWidth = video.videoWidth * videoScale;
-  const visibleHeight = video.videoHeight * videoScale;
-  const scaleX = visibleWidth / clip.width;
-  const scaleY = visibleHeight / clip.height;
-  const vehicles = frames[Math.floor(time * clip.fps + 1e-7)] ?? [];
+  const { left, top, scaleX, scaleY } = videoProjection(
+    { width, height }, { width: video.videoWidth, height: video.videoHeight }, clip,
+  );
+  const vehicles = frames[frameAtTime(time, clip.fps)] ?? [];
 
   context.save();
   try {
-    context.translate((width - visibleWidth) / 2, (height - visibleHeight) / 2);
+    context.translate(left, top);
     context.scale(scaleX, scaleY);
     context.beginPath();
     context.rect(0, 0, clip.width, clip.height);

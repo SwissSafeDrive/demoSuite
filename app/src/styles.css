@@ -438,3 +438,56 @@ body {
   height: 100%;
   pointer-events: none;
 }
+
+.single-case-analysis {
+  max-width: 1240px;
+}
+
+.recorded-analysis.with-windshield {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 34%);
+  gap: 16px;
+  align-items: start;
+}
+
+.windshield-panel {
+  background: #0f1318;
+  color: #fff;
+}
+
+.windshield-case,
+.case-detail-footage .windshield-zoom {
+  padding: 12px;
+  margin: 0;
+}
+
+.windshield-case p {
+  margin-top: 4px;
+}
+
+.windshield-viewport {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  overflow: auto;
+  background: #202831;
+}
+
+.windshield-viewport img {
+  display: block;
+  max-width: none;
+}
+
+.windshield-viewport p {
+  padding: 12px;
+}
+
+.windshield-zoom input {
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .recorded-analysis.with-windshield {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -249,3 +249,11 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 15 tests, including real bridge-frame fetches, geometry and unavailable crops. Starlette reported one dependency deprecation warning.
 - Verified 8,890 local JPEGs for 93 Passes and Not assessable entries for 38 Passes in `/workspace/demo-map/windshield-crops/`. All 131 metadata requests and the three Candidate bridge image requests passed. No ticket implementation issues remain.
 - Next action for the orchestrator is to integrate the signed ticket branch and use the crop routes for the side panel in #23.
+
+## DemoSuite ticket #23
+
+- Tracked vehicle boxes open Single Case Analysis and switch the selected Pass on the same player. The side panel follows the displayed frame, supports 1–4× zoom with scrolling, and shows Not assessable when the crop is unusable or missing.
+- Manual promotion sets `flagged_manually` through the session-protected Pass API. The mark survives browser reloads during the backend process. The saved fixture classification remains available for distinguishing automatic and manual Candidates and for gating crop availability.
+- Changed `app/src/App.jsx`, `app/src/api/client.js`, `app/src/media/{RecordedPlayer.jsx,videoOverlay.js,WindshieldPanel.jsx}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `app/tests/vehicleSelection.test.js`, `backend/{main,crop_routes}.py`, `backend/tests/{test_crops_api,test_pass_promotion}.py` and this handoff.
+- The full backend suite passed 20 tests with one Starlette dependency deprecation warning. The Node hit-test passed and the Vite build succeeded. Chrome verified vehicle switching, playback, exact crop after seek, zoom, missing-crop display and manual flag retrieval. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-23-{candidate,not-assessable}.png`.
+- Manual flags reset when the backend restarts. Next, connect the Candidate list to the Pass selection and manual flag field during integration.

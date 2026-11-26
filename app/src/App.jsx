@@ -7,17 +7,31 @@ export default function App() {
   const [vista, setVista] = useState("dashboard");
   const [registroSeleccionado, setRegistroSeleccionado] = useState(null);
 
+  const [passSelection, setPassSelection] = useState(null);
+
+  function openPass(passId, clipId) {
+    setPassSelection({ passId, clipId });
+    setVista("case-detail");
+  }
+
+  function clearPass() {
+    setPassSelection(null);
+  }
+
   const abrirRegistro = (registro) => {
+    clearPass();
     setRegistroSeleccionado(registro);
     setVista("case-detail");
   };
 
   const volverDashboard = () => {
+    clearPass();
     setRegistroSeleccionado(null);
     setVista("dashboard");
   };
 
   const irACamara = () => {
+    clearPass();
     setRegistroSeleccionado(null);
     setVista("camara");
   };
@@ -47,9 +61,12 @@ export default function App() {
         {vista === "dashboard" && (
           <Dashboard onAbrirRegistro={abrirRegistro} />
         )}
-        {vista === "case-detail" && registroSeleccionado && (
+        {vista === "case-detail" && (
           <CaseDetail
             record={registroSeleccionado}
+            selection={passSelection}
+            onOpenPass={openPass}
+            onClearPass={clearPass}
             onBack={volverDashboard}
           />
         )}

@@ -108,3 +108,14 @@ assert all(edge.any() for edge in (image[0], image[-1], image[:, 0], image[:, -1
             assert metadata["status"] == "Not assessable"
             assert metadata["frames"] == []
             assert client.get(f"{route}/0", headers=HEADERS).status_code == 404
+
+
+def test_unusable_or_missing_crop_metadata_has_no_frames(client, tmp_path, monkeypatch):
+    monkeypatch.setenv("SSD_CROP_DIR", str(tmp_path))
+    for pass_id in ("Cba002-090", "Cba002-068"):
+        route = f"/api/passes/{pass_id}/crops"
+        metadata = client.get(route, headers=HEADERS)
+        assert metadata.status_code == 200
+        assert metadata.json()["status"] == "Not assessable"
+        assert metadata.json()["frames"] == []
+        assert client.get(f"{route}/1203", headers=HEADERS).status_code == 404
