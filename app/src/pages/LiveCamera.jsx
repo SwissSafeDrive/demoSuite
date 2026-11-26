@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { uploadCapture } from "../api/client";
 
-export default function CamaraEnVivo({ onVolver }) {
+export default function LiveCamera({ onBack }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const intervalRef = useRef(null);
 
-  const [activa, setActiva] = useState(false);
-  const [modoDemo, setModoDemo] = useState(false);
-  const [verificando, setVerificando] = useState(true);
-  const [autoCaptura, setAutoCaptura] = useState(false);
-  const [contador, setContador] = useState(0);
-  const [avvisoStato, setAvvisoStato] = useState(null);
-  const [ultimoRegistro, setUltimoRegistro] = useState(null);
-  const [intervaloSeg, setIntervaloSeg] = useState(5);
+  const [active, setActive] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [autoCapture, setAutoCapture] = useState(false);
+  const [captureCount, setCaptureCount] = useState(0);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [lastRecord, setLastRecord] = useState(null);
+  const [intervalSeconds, setIntervalSeconds] = useState(5);
 
-  const detenerCamara = () => {
+  const stopCamera = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -25,19 +25,19 @@ export default function CamaraEnVivo({ onVolver }) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
-    setActiva(false);
-    setAutoCaptura(false);
+    setActive(false);
+    setAutoCapture(false);
   };
 
-  const iniciarCamara = async () => {
-    setVerificando(true);
-    setAvvisoStato(null);
+  const startCamera = async () => {
+    setChecking(true);
+    setStatusMessage(null);
     try {
       if (
         !navigator.mediaDevices ||
         typeof navigator.mediaDevices.getUserMedia !== "function"
       ) {
-        throw new Error("MediaDevices non disponibile");
+        throw new Error("MediaDevices unavailable");
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -50,25 +50,25 @@ export default function CamaraEnVivo({ onVolver }) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
-      setModoDemo(false);
-      setActiva(true);
+      setDemoMode(false);
+      setActive(true);
     } catch (_err) {
-      detenerCamara();
-      setModoDemo(true);
+      stopCamera();
+      setDemoMode(true);
     } finally {
-      setVerificando(false);
+      setChecking(false);
     }
   };
 
   useEffect(() => {
-    iniciarCamara();
+    startCamera();
     return () => {
-      detenerCamara();
+      stopCamera();
     };
   }, []);
 
-  const capturarFrame = async () => {
-    if (!activa || !videoRef.current || !canvasRef.current) return;
+  const captureFrame = async () => {
+    if (!active || !videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth || 1280;
@@ -80,12 +80,12 @@ export default function CamaraEnVivo({ onVolver }) {
       async (blob) => {
         if (!blob) return;
         try {
-          const reg = await uploadCapture(blob);
-          setUltimoRegistro(reg);
-          setContador((c) => c + 1);
-          setAvvisoStato("Frame registrato in locale.");
+          const record = await uploadCapture(blob);
+          setLastRecord(record);
+          setCaptureCount((c) => c + 1);
+          setStatusMessage("Frame saved locally.");
         } catch (_e) {
-          setAvvisoStato("Servizio locale temporaneamente occupato. Riprovare.");
+          setStatusMessage("Local service is busy. Try again.");
         }
       },
       "image/jpeg",
@@ -93,29 +93,29 @@ export default function CamaraEnVivo({ onVolver }) {
     );
   };
 
-  const toggleAutoCaptura = () => {
-    if (autoCaptura) {
+  const toggleAutoCapture = () => {
+    if (autoCapture) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      setAutoCaptura(false);
+      setAutoCapture(false);
     } else {
       intervalRef.current = setInterval(() => {
-        capturarFrame();
-      }, intervaloSeg * 1000);
-      setAutoCaptura(true);
+        captureFrame();
+      }, intervalSeconds * 1000);
+      setAutoCapture(true);
     }
   };
 
   return (
     <div className="case-detail-container">
       <div className="case-detail-header">
-        <button onClick={onVolver}>← Torna all'elenco</button>
-        <h2>Camera in diretta</h2>
+        <button onClick={onBack}>← Back to Candidate list</button>
+        <h2>Live camera</h2>
       </div>
 
-      {modoDemo && !activa && (
+      {demoMode && !active && (
         <div
           style={{
             background: "#f8fafc",
@@ -136,17 +136,15 @@ export default function CamaraEnVivo({ onVolver }) {
               marginBottom: "8px",
             }}
           >
-            MODALITÀ DEMO — NESSUNA CAMERA COLLEGATA
+            DEMO MODE — NO CAMERA CONNECTED
           </div>
           <p style={{ fontSize: "0.9rem", color: "#475569", marginBottom: "14px" }}>
-            Nessuna videocamera fisica rilevata o autorizzata su questa postazione.
-            L'applicazione è attiva in modalità dimostrativa locale e non simula
-            alcun flusso video reale. È possibile esaminare i registri dimostrativi
-            e testare il flusso decisionale nella sezione Registri.
+            A local camera is unavailable or permission was denied. You can review
+            recorded footage and try the decision workflow from the Candidate list.
           </p>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <button
-              onClick={onVolver}
+              onClick={onBack}
               style={{
                 padding: "9px 18px",
                 background: "#1e3a8a",
@@ -157,10 +155,10 @@ export default function CamaraEnVivo({ onVolver }) {
                 fontWeight: 600,
               }}
             >
-              Vai a Registri
+              Open Candidate list
             </button>
             <button
-              onClick={iniciarCamara}
+              onClick={startCamera}
               style={{
                 padding: "9px 18px",
                 background: "#e2e8f0",
@@ -171,13 +169,13 @@ export default function CamaraEnVivo({ onVolver }) {
                 fontWeight: 600,
               }}
             >
-              Riprova collegamento camera
+              Retry camera connection
             </button>
           </div>
         </div>
       )}
 
-      {avvisoStato && (
+      {statusMessage && (
         <div
           style={{
             background: "#f1f5f9",
@@ -189,13 +187,13 @@ export default function CamaraEnVivo({ onVolver }) {
             color: "#334155",
           }}
         >
-          {avvisoStato}
+          {statusMessage}
         </div>
       )}
 
       <div
         style={{
-          background: activa ? "#000000" : "#0f172a",
+          background: active ? "#000000" : "#0f172a",
           borderRadius: "8px",
           overflow: "hidden",
           marginBottom: "16px",
@@ -212,13 +210,13 @@ export default function CamaraEnVivo({ onVolver }) {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            display: activa ? "block" : "none",
+            display: active ? "block" : "none",
           }}
           muted
           playsInline
         />
 
-        {!activa && (
+        {!active && (
           <div
             style={{
               textAlign: "center",
@@ -228,14 +226,14 @@ export default function CamaraEnVivo({ onVolver }) {
             }}
           >
             <p style={{ fontWeight: 700, fontSize: "1rem", marginBottom: "8px" }}>
-              {verificando
-                ? "Verifica disponibilità videocamera…"
-                : "MODALITÀ DEMO — NESSUNA CAMERA COLLEGATA"}
+              {checking
+                ? "Checking camera availability…"
+                : "DEMO MODE — NO CAMERA CONNECTED"}
             </p>
             <p style={{ fontSize: "0.85rem", color: "#94a3b8" }}>
-              {verificando
-                ? "Richiesta accesso al dispositivo video locale in corso."
-                : "Nessun flusso video attivo. L'applicazione non mostra video simulati al posto di una videocamera reale."}
+              {checking
+                ? "Requesting access to the local camera."
+                : "Waiting for a live video feed."}
             </p>
           </div>
         )}
@@ -244,7 +242,7 @@ export default function CamaraEnVivo({ onVolver }) {
       <canvas ref={canvasRef} style={{ display: "none" }} />
 
       <div className="case-detail-info">
-        <h3>Controlli</h3>
+        <h3>Controls</h3>
         <div
           style={{
             display: "flex",
@@ -253,11 +251,11 @@ export default function CamaraEnVivo({ onVolver }) {
             alignItems: "center",
           }}
         >
-          {!activa ? (
+          {!active ? (
             <>
               <button
-                onClick={iniciarCamara}
-                disabled={verificando}
+                onClick={startCamera}
+                disabled={checking}
                 style={{
                   padding: "10px 20px",
                   background: "#1e3a8a",
@@ -268,10 +266,10 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontWeight: 600,
                 }}
               >
-                {verificando ? "Verifica in corso…" : "Attiva camera reale"}
+                {checking ? "Checking…" : "Enable camera"}
               </button>
               <button
-                onClick={onVolver}
+                onClick={onBack}
                 style={{
                   padding: "10px 20px",
                   background: "#475569",
@@ -282,13 +280,13 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontWeight: 600,
                 }}
               >
-                Torna a Registri
+                Back to Candidate list
               </button>
             </>
           ) : (
             <>
               <button
-                onClick={capturarFrame}
+                onClick={captureFrame}
                 style={{
                   padding: "10px 20px",
                   background: "#059669",
@@ -299,14 +297,14 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontWeight: 600,
                 }}
               >
-                Cattura frame
+                Capture frame
               </button>
 
               <button
-                onClick={toggleAutoCaptura}
+                onClick={toggleAutoCapture}
                 style={{
                   padding: "10px 20px",
-                  background: autoCaptura ? "#475569" : "#f59e0b",
+                  background: autoCapture ? "#475569" : "#f59e0b",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
@@ -314,7 +312,7 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontWeight: 600,
                 }}
               >
-                {autoCaptura ? "Ferma cattura auto" : "Avvia cattura auto"}
+                {autoCapture ? "Stop auto capture" : "Start auto capture"}
               </button>
 
               <label
@@ -325,13 +323,13 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontSize: "0.9rem",
                 }}
               >
-                Intervallo:
+                Interval
                 <input
                   type="number"
                   min="2"
                   max="60"
-                  value={intervaloSeg}
-                  onChange={(e) => setIntervaloSeg(parseInt(e.target.value) || 5)}
+                  value={intervalSeconds}
+                  onChange={(e) => setIntervalSeconds(parseInt(e.target.value) || 5)}
                   style={{
                     width: "60px",
                     padding: "6px",
@@ -344,8 +342,8 @@ export default function CamaraEnVivo({ onVolver }) {
 
               <button
                 onClick={() => {
-                  detenerCamara();
-                  setModoDemo(true);
+                  stopCamera();
+                  setDemoMode(true);
                 }}
                 style={{
                   padding: "10px 20px",
@@ -357,7 +355,7 @@ export default function CamaraEnVivo({ onVolver }) {
                   fontWeight: 600,
                 }}
               >
-                Disattiva camera
+                Disable camera
               </button>
             </>
           )}
@@ -365,35 +363,34 @@ export default function CamaraEnVivo({ onVolver }) {
       </div>
 
       <div className="case-detail-info">
-        <h3>Statistiche sessione</h3>
+        <h3>Session statistics</h3>
         <div className="case-detail-info-grid">
           <div className="case-detail-info-item">
-            <strong>Frame inviati</strong>
-            {contador}
+            <strong>Frames uploaded</strong>
+            {captureCount}
           </div>
           <div className="case-detail-info-item">
-            <strong>Stato camera</strong>
-            {activa
-              ? "Camera reale attiva"
-              : "MODALITÀ DEMO — NESSUNA CAMERA COLLEGATA"}
+            <strong>Camera status</strong>
+            {active
+              ? "Live camera active"
+              : "DEMO MODE — NO CAMERA CONNECTED"}
           </div>
           <div className="case-detail-info-item">
-            <strong>Cattura automatica</strong>
-            {autoCaptura ? `Ogni ${intervaloSeg}s` : "Disattivata"}
+            <strong>Automatic capture</strong>
+            {autoCapture ? `Every ${intervalSeconds}s` : "Off"}
           </div>
-          {ultimoRegistro && (
+          {lastRecord && (
             <div className="case-detail-info-item">
-              <strong>Ultimo ID</strong>
-              {ultimoRegistro.event_id}
+              <strong>Latest record ID</strong>
+              {lastRecord.event_id}
             </div>
           )}
         </div>
       </div>
 
       <div className="case-detail-note">
-        <strong>Nota informativa:</strong> Privacy by Design — demo non destinata
-        a uso operativo · Dati minimizzati nel contesto della dimostrazione. Le
-        acquisizioni temporanee della sessione vengono rimosse alla chiusura.
+        <strong>Privacy notice</strong> Privacy by Design · For demonstration only.
+        The app removes temporary captures when the session ends.
       </div>
     </div>
   );

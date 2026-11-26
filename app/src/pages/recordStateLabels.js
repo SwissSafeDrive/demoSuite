@@ -1,6 +1,6 @@
 export const recordStateLabels = {
-  pending: "Pendente",
-  reviewed: "Revisato",
-  confirmed: "Confermato",
-  discarded: "Scartato",
+  pending: "Pending",
+  reviewed: "Reviewed",
+  confirmed: "Confirmed",
+  discarded: "Discarded",
 };

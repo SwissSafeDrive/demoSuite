@@ -1,220 +1,129 @@
-import { useState, useEffect, useMemo } from "react";
-import { getRecords, getStatistics } from "../api/client";
+import { useEffect, useState } from "react";
+import { getCandidates } from "../api/client";
 import { recordStateLabels } from "./recordStateLabels";
 
-export default function Dashboard({ onAbrirRegistro }) {
-  const [registros, setRegistros] = useState([]);
-  const [estadisticas, setEstadisticas] = useState(null);
-  const [cargando, setCargando] = useState(true);
+export default function Dashboard({ onOpenPass, opening }) {
+  const [candidates, setCandidates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stateFilter, setStateFilter] = useState("all");
+  const [minimumSignal, setMinimumSignal] = useState(0);
+  const [search, setSearch] = useState("");
 
-  const [filtroEstado, setFiltroEstado] = useState("todos");
-  const [filtroConfianza, setFiltroConfianza] = useState(0);
-  const [filtroBusqueda, setFiltroBusqueda] = useState("");
-
-  const cargarDatos = async () => {
-    setCargando(true);
+  const loadCandidates = async () => {
+    setLoading(true);
     setError(null);
     try {
-      const [regs, stats] = await Promise.all([
-        getRecords(),
-        getStatistics(),
-      ]);
-      setRegistros(regs);
-      setEstadisticas(stats);
-    } catch (e) {
-      setError(e.message);
+      setCandidates(await getCandidates());
+    } catch (error) {
+      setError(error.message);
     } finally {
-      setCargando(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    cargarDatos();
+    loadCandidates();
   }, []);
 
-  const registrosFiltrados = useMemo(() => {
-    return registros.filter((r) => {
-      if (filtroEstado !== "todos" && r.state !== filtroEstado) return false;
-      if (r.confidence < filtroConfianza) return false;
-      if (
-        filtroBusqueda &&
-        !r.location.toLowerCase().includes(filtroBusqueda.toLowerCase()) &&
-        !r.event_id.toLowerCase().includes(filtroBusqueda.toLowerCase())
-      )
-        return false;
-      return true;
-    });
-  }, [registros, filtroEstado, filtroConfianza, filtroBusqueda]);
-
-  const getBadgeClass = (confianza) => {
-    if (confianza >= 0.85) return "badge-alta";
-    if (confianza >= 0.7) return "badge-media";
-    return "badge-baja";
-  };
-
-  const formatFecha = (iso) => {
-    const d = new Date(iso);
-    return d.toLocaleString("it-CH", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  if (cargando) {
-    return (
-      <div style={{ padding: "60px", textAlign: "center", color: "#6b7280" }}>
-        <p>Caricamento registri…</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <p style={{ color: "#1e3a8a", fontWeight: 600, marginBottom: "12px" }}>
-          Servizio locale in fase di avvio o non raggiungibile
-        </p>
-        <p style={{ color: "#6b7280", fontSize: "0.85rem", marginBottom: "16px" }}>
-          {error}
-        </p>
-        <button
-          onClick={cargarDatos}
-          style={{
-            padding: "8px 16px",
-            background: "#1e3a8a",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Riprova
-        </button>
-      </div>
-    );
-  }
+  const visibleCandidates = candidates.filter(({ passId, state, signal }) =>
+    (stateFilter === "all" || state === stateFilter) &&
+    (minimumSignal === 0 || (signal && signal.percent >= minimumSignal)) &&
+    passId.toLowerCase().includes(search.trim().toLowerCase())
+  );
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h2>Registri indiciari</h2>
-        <p>
-          Elenco dei registri rilevati dal sistema. Privacy by Design — demo non
-          destinata a uso operativo · Dati minimizzati nel contesto della
-          dimostrazione. La decisione sanzionatoria spetta sempre ed
-          esclusivamente all'operatore umano.
-        </p>
-      </div>
+    <section className="dashboard">
+      <header className="dashboard-header">
+        <h2>Candidate list</h2>
+        <p>A human operator reviews each case and makes the final decision.</p>
+      </header>
 
-      {estadisticas && (
-        <div className="estadisticas">
-          <div className="stat-card">
-            <h3>Totale</h3>
-            <p className="stat-num">{estadisticas.total}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Pendenti</h3>
-            <p className="stat-num">{estadisticas.pending}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Revisati</h3>
-            <p className="stat-num">{estadisticas.reviewed}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Confidenza media</h3>
-            <p className="stat-num">
-              {(estadisticas.average_confidence * 100).toFixed(1)}%
-            </p>
-          </div>
+      {loading ? (
+        <p role="status">Loading Candidates…</p>
+      ) : error ? (
+        <div role="alert">
+          <p>Candidate list unavailable. {error}</p>
+          <button onClick={loadCandidates}>Retry</button>
         </div>
-      )}
-
-      <div className="filtro-bar">
-        <label>
-          Stato
-          <select
-            value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
-          >
-            <option value="todos">Tutti</option>
-            <option value="pending">Pendente</option>
-            <option value="reviewed">Revisato</option>
-            <option value="confirmed">Confermato</option>
-            <option value="discarded">Scartato</option>
-          </select>
-        </label>
-
-        <label>
-          Confidenza minima: {(filtroConfianza * 100).toFixed(0)}%
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value={filtroConfianza}
-            onChange={(e) => setFiltroConfianza(parseFloat(e.target.value))}
-          />
-        </label>
-
-        <label>
-          Cerca
-          <input
-            type="text"
-            placeholder="Luogo o ID…"
-            value={filtroBusqueda}
-            onChange={(e) => setFiltroBusqueda(e.target.value)}
-          />
-        </label>
-
-        <button onClick={cargarDatos}>Aggiorna</button>
-
-        <button
-          onClick={() => {
-            setFiltroEstado("todos");
-            setFiltroConfianza(0);
-            setFiltroBusqueda("");
-          }}
-        >
-          Azzera filtri
-        </button>
-      </div>
-
-      {registrosFiltrados.length === 0 ? (
-        <p style={{ padding: "40px", textAlign: "center", color: "#6b7280" }}>
-          Nessun registro corrisponde ai filtri selezionati.
-        </p>
       ) : (
-        <div className="registros-grid">
-          {registrosFiltrados.map((r) => (
-            <div
-              key={r.id}
-              className="registro-card"
-              onClick={() => onAbrirRegistro(r)}
-            >
-              <div className="registro-card-imagen">
-                <span>Immagine evento — demo</span>
-                <span className={`registro-card-badge ${getBadgeClass(r.confidence)}`}>
-                  {(r.confidence * 100).toFixed(0)}%
-                </span>
-              </div>
-              <div className="registro-card-info">
-                <h4>{r.location}</h4>
-                <p>{formatFecha(r.timestamp)}</p>
-                <p>
-                  Stato: <strong>{recordStateLabels[r.state]}</strong>
-                </p>
-                <p className="confianza">
-                  Confidenza: {(r.confidence * 100).toFixed(1)}%
-                </p>
-              </div>
+        <>
+          <div className="statistics">
+            <div className="stat-card">
+              <h3>Total Candidates</h3>
+              <p className="stat-num">{candidates.length}</p>
             </div>
-          ))}
-        </div>
+            {["pending", "reviewed"].map((state) => (
+              <div className="stat-card" key={state}>
+                <h3>{recordStateLabels[state]}</h3>
+                <p className="stat-num">
+                  {candidates.filter((candidate) => candidate.state === state).length}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="filter-bar">
+            <label>
+              Review state
+              <select value={stateFilter} onChange={(event) => setStateFilter(event.target.value)}>
+                <option value="all">All</option>
+                {Object.entries(recordStateLabels).map(([state, label]) => (
+                  <option key={state} value={state}>{label}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Minimum simulated signal · {minimumSignal}%
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={minimumSignal}
+                onChange={(event) => setMinimumSignal(Number(event.target.value))}
+              />
+            </label>
+            <label>
+              Search by Pass ID
+              <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} />
+            </label>
+            <button onClick={loadCandidates} disabled={opening}>Refresh</button>
+            <button onClick={() => {
+              setStateFilter("all");
+              setMinimumSignal(0);
+              setSearch("");
+            }}>
+              Reset filters
+            </button>
+          </div>
+
+          {visibleCandidates.length === 0 ? (
+            <p>No Candidates match these filters.</p>
+          ) : (
+            <div className="candidate-grid">
+              {visibleCandidates.map((candidate) => (
+                <button
+                  type="button"
+                  key={candidate.passId}
+                  className="candidate-card"
+                  style={{ borderTopColor: candidate.signal?.color }}
+                  onClick={() => onOpenPass(candidate)}
+                  disabled={opening}
+                >
+                  <strong>{candidate.passId}</strong>
+                  <span>{recordStateLabels[candidate.state]}</span>
+                  {candidate.signal && (
+                    <span className="confidence">
+                      {candidate.signal.label} · {candidate.signal.percent}%
+                    </span>
+                  )}
+                  {candidate.flagged_manually && <span>Flagged manually</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       )}
-    </div>
+    </section>
   );
 }

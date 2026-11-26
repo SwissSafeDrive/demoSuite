@@ -35,3 +35,7 @@ class StatisticsOut(BaseModel):
     confirmed: int
     discarded: int
     average_confidence: float
+
+
+class ManualFlagIn(BaseModel):
+    flagged_manually: bool

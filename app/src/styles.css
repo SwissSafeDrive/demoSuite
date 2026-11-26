@@ -53,7 +53,7 @@ body {
   border-top: 1px solid #e5e7eb;
 }
 
-.aviso-legal {
+.legal-notice {
   color: #b91c1c;
   font-weight: 600;
 }
@@ -72,7 +72,7 @@ body {
   font-size: 0.9rem;
 }
 
-.filtro-bar {
+.filter-bar {
   display: flex;
   gap: 16px;
   align-items: center;
@@ -84,7 +84,7 @@ body {
   flex-wrap: wrap;
 }
 
-.filtro-bar label {
+.filter-bar label {
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
@@ -92,15 +92,15 @@ body {
   color: #374151;
 }
 
-.filtro-bar input,
-.filtro-bar select {
+.filter-bar input,
+.filter-bar select {
   padding: 6px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.9rem;
 }
 
-.filtro-bar button {
+.filter-bar button {
   padding: 8px 16px;
   background: #1e3a8a;
   color: white;
@@ -111,11 +111,11 @@ body {
   margin-top: auto;
 }
 
-.filtro-bar button:hover {
+.filter-bar button:hover {
   background: #1e40af;
 }
 
-.estadisticas {
+.statistics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
@@ -143,44 +143,37 @@ body {
   color: #1e3a8a;
 }
 
-.registros-grid {
+.candidate-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
 
-.registro-card {
+.candidate-card {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 0;
+  border-top: 4px solid #6b7280;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: left;
+  font: inherit;
+  color: #334155;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.registro-card:hover {
-  transform: translateY(-2px);
+.candidate-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.registro-card-imagen {
-  height: 160px;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  font-size: 0.85rem;
-  position: relative;
+.candidate-card .confidence {
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.registro-card-imagen img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.registro-card-badge {
+.record-badge {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -192,37 +185,16 @@ body {
   text-transform: uppercase;
 }
 
-.badge-alta {
+.badge-high {
   background: #dc2626;
 }
 
-.badge-media {
+.badge-medium {
   background: #f59e0b;
 }
 
-.badge-baja {
+.badge-low {
   background: #6b7280;
-}
-
-.registro-card-info {
-  padding: 12px;
-}
-
-.registro-card-info h4 {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #111827;
-}
-
-.registro-card-info p {
-  font-size: 0.78rem;
-  color: #6b7280;
-  margin-bottom: 2px;
-}
-
-.registro-card-info .confianza {
-  color: #1e3a8a;
-  font-weight: 600;
 }
 
 .case-detail-container {
@@ -396,12 +368,6 @@ body {
 .case-detail-capture img {
   width: 100%;
   display: block;
-}
-
-.registro-card-imagen img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .case-detail-footage {

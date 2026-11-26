@@ -9,14 +9,16 @@ from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadF
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy import func, inspect, text
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
+from candidate_membership import candidate_row
 from clip_routes import create_clip_router
 from crop_routes import router as crop_router
 from database import Base, engine, get_db
 from models import Record, SIMULATED_NOTICE, TECHNICAL_NOTICE
 from pass_fixture import load_passes
-from schemas import DecisionIn, StatisticsOut, RecordOut
+from schemas import DecisionIn, ManualFlagIn, StatisticsOut, RecordOut
 
 
 def ensure_schema():
@@ -347,10 +349,18 @@ def get_image(record_id: int, db: Session = Depends(get_db)):
     return FileResponse(filepath, media_type="image/jpeg")
 
 
+manual_flags: dict[str, bool] = {}
+
+
+def pass_with_flag(record):
+    pass_id = record["passId"]
+    return {**record, "flagged_manually": manual_flags.get(pass_id, record["flagged_manually"])}
+
+
 @app.get("/api/passes", dependencies=[Depends(verify_session_token)])
 def list_passes(clip: str | None = None, track_id: int | None = None):
     return [
-        record for record in load_passes().values()
+        pass_with_flag(record) for record in load_passes().values()
         if (clip is None or record["clip"]["id"] == clip)
         and (track_id is None or track_id in record["track_ids"])
     ]
@@ -361,4 +371,49 @@ def get_pass(pass_id: str):
     record = load_passes().get(pass_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Pass not found")
-    return record
+    return pass_with_flag(record)
+
+
+@app.patch("/api/passes/{pass_id}/flag", dependencies=[Depends(verify_session_token)])
+def flag_pass(pass_id: str, flag: ManualFlagIn):
+    get_pass(pass_id)
+    manual_flags[pass_id] = flag.flagged_manually
+    return {"passId": pass_id, "flagged_manually": flag.flagged_manually}
+
+
+@app.get("/api/candidates", dependencies=[Depends(verify_session_token)])
+def list_candidates(db: Session = Depends(get_db)):
+    rows = []
+    for record in load_passes().values():
+        row = candidate_row(pass_with_flag(record))
+        if row is not None:
+            rows.append(row)
+
+    states = dict(
+        db.query(Record.event_id, Record.state)
+        .filter(Record.event_id.in_([row["passId"] for row in rows]))
+        .all()
+    )
+    return [{**row, "state": states.get(row["passId"], "pending")} for row in rows]
+
+
+@app.post(
+    "/api/passes/{pass_id}/record",
+    response_model=RecordOut,
+    dependencies=[Depends(verify_session_token)],
+)
+def open_pass_record(pass_id: str, db: Session = Depends(get_db)):
+    record = get_pass(pass_id)
+    db.execute(
+        insert(Record).values(
+            event_id=pass_id,
+            demo_id=pass_id,
+            location=record["clip"]["id"],
+            confidence=0.0,
+            origin="simulated",
+            notice=SIMULATED_NOTICE,
+        ).on_conflict_do_nothing(index_elements=[Record.event_id])
+    )
+    result = db.query(Record).filter(Record.event_id == pass_id).one()
+    db.commit()
+    return result

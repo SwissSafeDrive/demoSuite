@@ -52,7 +52,7 @@ function blurPlate(context, video, sample, box, clip) {
   context.drawImage(sample.canvas, left, top, width, height);
 }
 
-export function drawVideoOverlay(canvas, video, sample, playback, time) {
+export function drawVideoOverlay(canvas, video, sample, playback, time, selectedPassId) {
   const context = canvas.getContext("2d");
   const width = Math.round(canvas.clientWidth * window.devicePixelRatio);
   const height = Math.round(canvas.clientHeight * window.devicePixelRatio);
@@ -109,6 +109,17 @@ export function drawVideoOverlay(canvas, video, sample, playback, time) {
         context.fillStyle = "#FFFFFF";
         context.fillText(label, labelX + 5 * unit, labelY + 14 * unit);
       }
+    }
+
+    const selected = vehicles.find(({ passId }) => passId === selectedPassId);
+    if (selected) {
+      const [x1, y1, x2, y2] = selected.box;
+      context.strokeStyle = "#0F1318";
+      context.lineWidth = 5 * unit;
+      context.strokeRect(x1, y1, x2 - x1, y2 - y1);
+      context.strokeStyle = "#FFFFFF";
+      context.lineWidth = 2 * unit;
+      context.strokeRect(x1, y1, x2 - x1, y2 - y1);
     }
   } finally {
     context.restore();

@@ -249,3 +249,11 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 15 tests, including real bridge-frame fetches, geometry and unavailable crops. Starlette reported one dependency deprecation warning.
 - Verified 8,890 local JPEGs for 93 Passes and Not assessable entries for 38 Passes in `/workspace/demo-map/windshield-crops/`. All 131 metadata requests and the three Candidate bridge image requests passed. No ticket implementation issues remain.
 - Next action for the orchestrator is to integrate the signed ticket branch and use the crop routes for the side panel in #23.
+
+## DemoSuite ticket #24
+
+- Reused the registry layout for the English Candidate list and translated the review console shell and live-camera page. The list uses bridge decisions or manual flags, shows labelled simulated scores, and opens the selected vehicle at its bridge frame.
+- Added an API route that opens a stable review Record for a Pass. The existing decision route saves the operator's review state and the list reflects it on return.
+- Changed `app/src/{App.jsx,api/client.js,media/RecordedPlayer.jsx,media/videoOverlay.js,pages/CaseDetail.jsx,pages/Dashboard.jsx,pages/recordStateLabels.js,styles.css}`, renamed `CamaraEnVivo.jsx` to `LiveCamera.jsx`, and changed `backend/{main,schemas,candidate_membership}.py`, `backend/tests/test_membership.py` and this handoff.
+- The full backend suite passed 23 tests with one Starlette deprecation warning. The Vite build passed. Real Chrome showed three Candidates and opened Cba002-068 at 48.12 seconds. All three review decisions persisted. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-24-*.png`.
+- The manual-flag API stores flags for the current backend process. During integration, use #23's durable flag source for membership and connect its open-Pass action to the same case entry point.
