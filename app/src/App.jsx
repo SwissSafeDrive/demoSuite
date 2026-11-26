@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
-import RegistroDetalle from "./pages/RegistroDetalle";
+import CaseDetail from "./pages/CaseDetail";
 import CamaraEnVivo from "./pages/CamaraEnVivo";
 
 export default function App() {
@@ -9,7 +9,7 @@ export default function App() {
 
   const abrirRegistro = (registro) => {
     setRegistroSeleccionado(registro);
-    setVista("detalle");
+    setVista("case-detail");
   };
 
   const volverDashboard = () => {
@@ -47,10 +47,10 @@ export default function App() {
         {vista === "dashboard" && (
           <Dashboard onAbrirRegistro={abrirRegistro} />
         )}
-        {vista === "detalle" && registroSeleccionado && (
-          <RegistroDetalle
-            registro={registroSeleccionado}
-            onVolver={volverDashboard}
+        {vista === "case-detail" && registroSeleccionado && (
+          <CaseDetail
+            record={registroSeleccionado}
+            onBack={volverDashboard}
           />
         )}
         {vista === "camara" && <CamaraEnVivo onVolver={volverDashboard} />}

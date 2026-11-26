@@ -123,3 +123,9 @@ export async function fetchImageBlobUrl(recordId) {
 export async function getPass(id) {
   return fetchJSON(`/api/passes/${encodeURIComponent(id)}`);
 }
+
+export async function getClipPlayback(clipId) {
+  const { apiUrl } = await getSessionConfig();
+  const playback = await fetchJSON(`/api/clips/${encodeURIComponent(clipId)}/playback`);
+  return { ...playback, mediaUrl: new URL(playback.mediaPath, apiUrl).href };
+}
