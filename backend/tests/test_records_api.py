@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 
@@ -36,3 +38,28 @@ def test_review_controls_work_after_returning_to_same_record(client):
         assert response.status_code == 200
         assert response.json()["state"] == state
         assert response.json()["decision_at"]
+
+
+def test_pass_review_survives_seeking_from_bridge_to_approach(client, tmp_path, monkeypatch):
+    monkeypatch.setenv("SSD_CROP_DIR", str(tmp_path))
+    (tmp_path / "crop.jpg").write_bytes(b"local crop sample")
+    (tmp_path / "index.json").write_text(json.dumps({
+        "Cba002-068": {"status": "available", "frames": {"1190": "crop.jpg", "1203": "crop.jpg"}},
+    }))
+    pass_path = "/api/passes/Cba002-068"
+    opened = client.post(f"{pass_path}/record", headers=SESSION)
+    opened.raise_for_status()
+    record_path = f"/api/records/{opened.json()['id']}"
+
+    for frame, crop_status, state in (
+        (1203, 200, "reviewed"), (942, 404, "discarded"), (1190, 200, "confirmed"),
+    ):
+        # Fetch the displayed crop as the case view does after each seek.
+        crop = client.get(f"{pass_path}/crops/{frame}", headers=SESSION)
+        assert crop.status_code == crop_status
+        saved = client.patch(f"{record_path}/decision", headers=SESSION, json={"state": state})
+        saved.raise_for_status()
+        reopened = client.post(f"{pass_path}/record", headers=SESSION)
+        reopened.raise_for_status()
+        assert reopened.json()["id"] == opened.json()["id"]
+        assert reopened.json()["state"] == state

@@ -82,3 +82,19 @@ def test_repository_payload_has_no_storage_credentials():
         path = ROOT / filename
         if path.is_file():
             assert not pattern.search(path.read_bytes()), filename
+
+
+@pytest.mark.parametrize("pass_id", CANDIDATES)
+def test_case_presents_bridge_snapshot_and_flag_time(passes, pass_id):
+    bridge, _ = CANDIDATES[pass_id]
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e", """
+            import { readFileSync } from 'node:fs';
+            import { bridgeDecision } from './app/src/media/passAnalysis.js';
+            console.log(JSON.stringify(bridgeDecision(JSON.parse(readFileSync(0, 'utf8')))));
+        """],
+        cwd=ROOT, input=json.dumps(passes[pass_id]), text=True, capture_output=True, check=True,
+    )
+    decision = json.loads(result.stdout)
+    assert decision["flagTime"] == bridge / 25
+    assert decision["snapshots"] == [{"frame": bridge, "time": bridge / 25}]
