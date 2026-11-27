@@ -272,3 +272,11 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - Changed `app/src/media/{PassTimeline.jsx,RecordedPlayer.jsx,WindshieldPanel.jsx,passAnalysis.js}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `backend/tests/{test_fixture,test_records_api,test_stretches}.py` and this handoff.
 - The full backend suite passed all 32 tests with one Starlette deprecation warning. The Node vehicle-selection test and Vite build passed. Real Chrome verified all three stretch seeks, zoom, playback through the Pass end, box selection, Not assessable, manual promotion and persistence of all three English review actions. Five captures are in `~/agent-notes/demoSuite-26/evidence/ticket-25-*.png`.
 - Manual flags are scoped to the backend process. The next step for the orchestrator is to integrate the signed branch and continue the spec workflow.
+
+## DemoSuite frontend purification (Group A)
+
+- Removed the unreachable generic case detail, captured-image view, clip chooser, and their unused client helpers and styles. Renamed the overlay draw order to describe vehicles with signal data drawing last.
+- Changed `app/src/pages/CaseDetail.jsx`, `app/src/media/RecordedPlayer.jsx`, `app/src/api/client.js`, `app/src/media/videoOverlay.js`, `app/src/styles.css` and this handoff.
+- `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 32 tests with one Starlette dependency deprecation warning. Hit-testing code was untouched.
+- The global instructions file at `/Users/david/dAvId_AI/AGENTS.md` was absent in this workspace. No implementation issues remain.
+- Next action for the orchestrator is to integrate the signed Group A commit and continue the review workflow.

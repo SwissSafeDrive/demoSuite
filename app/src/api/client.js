@@ -55,18 +55,6 @@ async function fetchJSON(path, options = {}) {
   return res.json();
 }
 
-export async function getRecords() {
-  return fetchJSON("/api/records");
-}
-
-export async function getStatistics() {
-  return fetchJSON("/api/statistics");
-}
-
-export async function getRecord(id) {
-  return fetchJSON(`/api/records/${id}`);
-}
-
 export async function submitDecision(id, state, operatorId = "demo_operator") {
   return fetchJSON(`/api/records/${id}/decision`, {
     method: "PATCH",
@@ -110,10 +98,6 @@ async function fetchImageBlob(path, signal) {
     throw new Error(`Image unavailable (${res.status})`);
   }
   return res.blob();
-}
-
-export async function fetchImageBlobUrl(recordId) {
-  return URL.createObjectURL(await fetchImageBlob(`/api/images/${recordId}`));
 }
 
 export function getPassCrops(id) {
