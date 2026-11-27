@@ -32,7 +32,6 @@ def test_review_controls_work_after_returning_to_same_record(client):
     records = client.get("/api/records", headers=SESSION).json()
     path = f"/api/records/{records[0]['id']}"
     for state in ("discarded", "reviewed", "confirmed"):
-        # Reopen the same record as the case view would after a seek.
         assert client.get(path, headers=SESSION).status_code == 200
         response = client.patch(f"{path}/decision", headers=SESSION, json={"state": state})
         assert response.status_code == 200
@@ -54,7 +53,6 @@ def test_pass_review_survives_seeking_from_bridge_to_approach(client, tmp_path, 
     for frame, crop_status, state in (
         (1203, 200, "reviewed"), (942, 404, "discarded"), (1190, 200, "confirmed"),
     ):
-        # Fetch the displayed crop as the case view does after each seek.
         crop = client.get(f"{pass_path}/crops/{frame}", headers=SESSION)
         assert crop.status_code == crop_status
         saved = client.patch(f"{record_path}/decision", headers=SESSION, json={"state": state})
