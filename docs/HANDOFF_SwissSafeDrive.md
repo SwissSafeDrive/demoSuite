@@ -280,3 +280,10 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 32 tests with one Starlette dependency deprecation warning. Hit-testing code was untouched.
 - The global instructions file at `/Users/david/dAvId_AI/AGENTS.md` was absent in this workspace. No implementation issues remain.
 - Next action for the orchestrator is to integrate the signed Group A commit and continue the review workflow.
+
+## DemoSuite review fix F2 (C5)
+
+- Moved the selected vehicle's dark and white strokes outside its coloured box in `app/src/media/videoOverlay.js`. Recorded the change in this handoff.
+- The full backend suite passed all 32 tests with one Starlette deprecation warning. The Node vehicle-selection test passed.
+- The global instructions file at `/Users/david/dAvId_AI/AGENTS.md` was absent. Visual validation remains pending.
+- Next action for the orchestrator is to verify the outline during recorded playback and integrate the signed fix.

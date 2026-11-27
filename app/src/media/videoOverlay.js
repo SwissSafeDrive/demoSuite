@@ -147,12 +147,15 @@ export function drawVideoOverlay(canvas, video, sample, playback, time, selected
     const selected = vehicles.find(({ passId }) => passId === selectedPassId);
     if (selected) {
       const [x1, y1, x2, y2] = selected.box;
+      const outlineWidth = 5 * unit;
+      const outset = 2 * unit + outlineWidth / 2;
+      const outline = [x1 - outset, y1 - outset, x2 - x1 + 2 * outset, y2 - y1 + 2 * outset];
       context.strokeStyle = "#0F1318";
-      context.lineWidth = 5 * unit;
-      context.strokeRect(x1, y1, x2 - x1, y2 - y1);
+      context.lineWidth = outlineWidth;
+      context.strokeRect(...outline);
       context.strokeStyle = "#FFFFFF";
       context.lineWidth = 2 * unit;
-      context.strokeRect(x1, y1, x2 - x1, y2 - y1);
+      context.strokeRect(...outline);
     }
   } finally {
     context.restore();
