@@ -53,7 +53,7 @@ body {
   border-top: 1px solid #e5e7eb;
 }
 
-.aviso-legal {
+.legal-notice {
   color: #b91c1c;
   font-weight: 600;
 }
@@ -72,7 +72,7 @@ body {
   font-size: 0.9rem;
 }
 
-.filtro-bar {
+.filter-bar {
   display: flex;
   gap: 16px;
   align-items: center;
@@ -84,7 +84,7 @@ body {
   flex-wrap: wrap;
 }
 
-.filtro-bar label {
+.filter-bar label {
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
@@ -92,15 +92,15 @@ body {
   color: #374151;
 }
 
-.filtro-bar input,
-.filtro-bar select {
+.filter-bar input,
+.filter-bar select {
   padding: 6px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.9rem;
 }
 
-.filtro-bar button {
+.filter-bar button {
   padding: 8px 16px;
   background: #1e3a8a;
   color: white;
@@ -111,11 +111,11 @@ body {
   margin-top: auto;
 }
 
-.filtro-bar button:hover {
+.filter-bar button:hover {
   background: #1e40af;
 }
 
-.estadisticas {
+.statistics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
@@ -143,101 +143,49 @@ body {
   color: #1e3a8a;
 }
 
-.registros-grid {
+.candidate-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
 
-.registro-card {
+.candidate-card {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 0;
+  border-top: 4px solid #6b7280;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: left;
+  font: inherit;
+  color: #334155;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.registro-card:hover {
-  transform: translateY(-2px);
+.candidate-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.registro-card-imagen {
-  height: 160px;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  font-size: 0.85rem;
-  position: relative;
-}
-
-.registro-card-imagen img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.registro-card-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
+.candidate-card .confidence {
+  font-size: 0.8rem;
   font-weight: 700;
-  color: white;
-  text-transform: uppercase;
 }
 
-.badge-alta {
-  background: #dc2626;
-}
-
-.badge-media {
-  background: #f59e0b;
-}
-
-.badge-baja {
-  background: #6b7280;
-}
-
-.registro-card-info {
-  padding: 12px;
-}
-
-.registro-card-info h4 {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #111827;
-}
-
-.registro-card-info p {
-  font-size: 0.78rem;
-  color: #6b7280;
-  margin-bottom: 2px;
-}
-
-.registro-card-info .confianza {
-  color: #1e3a8a;
-  font-weight: 600;
-}
-
-.detalle-container {
+.case-detail-container {
   max-width: 900px;
   margin: 0 auto;
 }
 
-.detalle-header {
+.case-detail-header {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
 }
 
-.detalle-header button {
+.case-detail-header button {
   padding: 8px 16px;
   background: #e5e7eb;
   color: #374151;
@@ -247,35 +195,15 @@ body {
   font-size: 0.9rem;
 }
 
-.detalle-header button:hover {
+.case-detail-header button:hover {
   background: #d1d5db;
 }
 
-.detalle-header h2 {
+.case-detail-header h2 {
   font-size: 1.3rem;
 }
 
-.detalle-imagen {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.detalle-imagen img {
-  width: 100%;
-  display: block;
-}
-
-.detalle-imagen-placeholder {
-  padding: 60px;
-  text-align: center;
-  color: #9ca3af;
-  background: #f3f4f6;
-}
-
-.detalle-info {
+.case-detail-info {
   background: white;
   border-radius: 8px;
   padding: 20px;
@@ -283,23 +211,23 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.detalle-info h3 {
+.case-detail-info h3 {
   font-size: 1rem;
   margin-bottom: 12px;
   color: #111827;
 }
 
-.detalle-info-grid {
+.case-detail-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 
-.detalle-info-item {
+.case-detail-info-item {
   font-size: 0.85rem;
 }
 
-.detalle-info-item strong {
+.case-detail-info-item strong {
   display: block;
   color: #6b7280;
   font-size: 0.75rem;
@@ -308,13 +236,13 @@ body {
   margin-bottom: 2px;
 }
 
-.detalle-acciones {
+.case-detail-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-.detalle-acciones button {
+.case-detail-actions button {
   flex: 1;
   padding: 12px 20px;
   border: none;
@@ -325,26 +253,26 @@ body {
   transition: opacity 0.15s;
 }
 
-.detalle-acciones button:hover {
+.case-detail-actions button:hover {
   opacity: 0.9;
 }
 
-.btn-descartar {
+.btn-discard {
   background: #e5e7eb;
   color: #374151;
 }
 
-.btn-revisar {
+.btn-mark-for-review {
   background: #f59e0b;
   color: white;
 }
 
-.btn-confirmar {
+.btn-confirm {
   background: #dc2626;
   color: white;
 }
 
-.detalle-nota {
+.case-detail-note {
   margin-top: 20px;
   padding: 12px;
   background: #fef3c7;
@@ -385,21 +313,210 @@ body {
   border-color: white;
 }
 
-/* Imagen real del registro */
-.detalle-imagen-real {
-  background: black;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
+.case-detail-footage {
+  margin-bottom: 24px;
 }
 
-.detalle-imagen-real img {
-  width: 100%;
+.case-detail-footage label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.recorded-player {
+  position: relative;
+  background: #0f1318;
+}
+
+.recorded-player video {
   display: block;
+  width: 100%;
+  height: clamp(220px, 55vh, 620px);
+  object-fit: contain;
 }
 
-.registro-card-imagen img {
+.recorded-player video::-webkit-media-controls-fullscreen-button {
+  display: none;
+}
+
+.recorded-player canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  pointer-events: none;
+}
+
+.single-case-analysis {
+  max-width: 1240px;
+}
+
+.recorded-analysis.with-windshield {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 34%);
+  gap: 16px;
+  align-items: start;
+}
+
+.windshield-panel {
+  background: #0f1318;
+  color: #fff;
+}
+
+.windshield-case,
+.case-detail-footage .windshield-zoom {
+  padding: 12px;
+  margin: 0;
+}
+
+.windshield-case p {
+  margin-top: 4px;
+}
+
+.windshield-viewport {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  overflow: auto;
+  background: #202831;
+}
+
+.windshield-viewport img {
+  display: block;
+  max-width: none;
+}
+
+.windshield-viewport p {
+  padding: 12px;
+}
+
+.windshield-zoom input {
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .recorded-analysis.with-windshield {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pass-timeline {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #dbe2ea;
+}
+
+.recorded-analysis.with-windshield .windshield-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.pass-playback,
+.pass-time-bounds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pass-timeline input[type="range"] {
+  width: 100%;
+}
+
+.pass-stretch-track {
+  position: relative;
+  height: 12px;
+  border-radius: 4px;
+  background: #dbe2ea;
+}
+
+.pass-stretch-track button {
+  position: absolute;
+  height: 100%;
+  min-width: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: #a34716;
+}
+
+.pass-stretches {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+
+.pass-stretches button {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.simulated-signal {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff0d6;
+  color: #713900;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bridge-snapshot {
+  margin: 8px 0 0;
+}
+
+.bridge-snapshot img {
+  display: block;
+  width: 100%;
+}
+
+.bridge-snapshot figcaption {
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .recorded-analysis.with-windshield .windshield-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .pass-timeline {
+    grid-row: auto;
+  }
+}
+
+.pass-playback button,
+.pass-stretches button,
+.windshield-case button {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pass-playback button:hover,
+.pass-stretches button:hover,
+.windshield-case button:not(:disabled):hover {
+  background: #edf2fa;
+}
+
+.windshield-case button:disabled {
+  opacity: 0.7;
+  cursor: default;
 }

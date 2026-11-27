@@ -1,36 +1,71 @@
 from contextlib import asynccontextmanager
-from datetime import datetime
-from typing import List, Optional
+from datetime import UTC, datetime
+from typing import List, Literal, Optional
 import os
 import secrets
-import shutil
 import uuid
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from sqlalchemy import func, inspect
+from pydantic import BaseModel
+from sqlalchemy import func, inspect, text
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
+from candidate_membership import candidate_row
+from clip_routes import create_clip_router
+from crop_routes import router as crop_router
 from database import Base, engine, get_db
-from models import Registro
-from schemas import DecisionIn, EstadisticasOut, RegistroOut
+from models import Record, SIMULATED_NOTICE, TECHNICAL_NOTICE
+from pass_fixture import load_passes
+from schemas import DecisionIn, ManualFlagIn as FlagUpdateIn, StatisticsOut, RecordOut
 
 
 def ensure_schema():
-    inspector = inspect(engine)
-    if inspector.has_table("registros"):
-        cols = {c["name"] for c in inspector.get_columns("registros")}
-        if "identificatore_demo" not in cols:
-            Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    with engine.begin() as connection:
+        # Keep schema creation and the one-time copy in the same SQLite transaction.
+        connection.exec_driver_sql("BEGIN IMMEDIATE")
+        inspector = inspect(connection)
+        if inspector.has_table("records"):
+            return
+        Base.metadata.create_all(bind=connection)
+        if not inspector.has_table("registros"):
+            return
+
+        # The older registry may predate the demo identifier.
+        columns = {column["name"] for column in inspector.get_columns("registros")}
+        legacy_demo_id = "identificatore_demo" if "identificatore_demo" in columns else "NULL"
+        connection.execute(text(f"""
+            INSERT INTO records (
+                id, event_id, timestamp, confidence, location, demo_id, image_path,
+                state, operator_id, decision_at, origin, notice
+            )
+            SELECT id, inf_id, timestamp, confianza,
+                replace(replace(replace(ubicacion,
+                    'Area urbana — Postazione demo', 'Urban area — Demo station'),
+                    'Asse principale — Postazione demo', 'Main road — Demo station'),
+                    'Camera locale', 'Local camera'),
+                {legacy_demo_id}, imagen_path,
+                CASE estado
+                    WHEN 'revisado' THEN 'reviewed'
+                    WHEN 'confirmado' THEN 'confirmed'
+                    WHEN 'descartado' THEN 'discarded'
+                    ELSE 'pending'
+                END,
+                agente_id, fecha_decision,
+                CASE origen WHEN 'camara' THEN 'camera' ELSE 'simulated' END,
+                CASE origen WHEN 'camara' THEN :technical ELSE :simulated END
+            FROM registros
+        """), {"technical": TECHNICAL_NOTICE, "simulated": SIMULATED_NOTICE})
 
 
 ensure_schema()
 
 DATA_DIR = os.environ.get("SSD_DATA_DIR", os.path.dirname(__file__))
-CAPTURAS_DIR = os.path.join(DATA_DIR, "capturas")
-os.makedirs(CAPTURAS_DIR, exist_ok=True)
+CAPTURES_DIR = os.path.join(DATA_DIR, "captures")
+LEGACY_CAPTURES_DIR = os.path.join(DATA_DIR, "capturas")
+os.makedirs(CAPTURES_DIR, exist_ok=True)
 
 SESSION_TOKEN = os.environ.get("SSD_SESSION_TOKEN") or secrets.token_hex(32)
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
@@ -43,19 +78,20 @@ ALLOWED_CONTENT_TYPES = {
 
 
 def cleanup_temp_captures():
-    try:
-        if os.path.isdir(CAPTURAS_DIR):
-            for entry in os.listdir(CAPTURAS_DIR):
-                full_path = os.path.join(CAPTURAS_DIR, entry)
-                if os.path.isfile(full_path):
-                    os.remove(full_path)
-    except OSError:
-        pass
+    for directory in (CAPTURES_DIR, LEGACY_CAPTURES_DIR):
+        try:
+            if os.path.isdir(directory):
+                for entry in os.listdir(directory):
+                    full_path = os.path.join(directory, entry)
+                    if os.path.isfile(full_path):
+                        os.remove(full_path)
+        except OSError:
+            pass
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    os.makedirs(CAPTURAS_DIR, exist_ok=True)
+    os.makedirs(CAPTURES_DIR, exist_ok=True)
     try:
         yield
     finally:
@@ -64,7 +100,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="SwissSafeDrive API",
-    description="API per il sistema dimostrativo di rilevamento uso telefono alla guida",
+    description="API for the phone-use detection demo",
     version="0.2.2",
     lifespan=lifespan,
 )
@@ -79,7 +115,7 @@ app.add_middleware(
     ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-    allow_headers=["Content-Type", "X-SSD-Session"],
+    allow_headers=["Content-Type", "X-SSD-Session", "Range"],
 )
 
 
@@ -91,8 +127,12 @@ def verify_session_token(
     ):
         raise HTTPException(
             status_code=401,
-            detail="Sessione non autorizzata",
+            detail="Unauthorized session",
         )
+
+
+app.include_router(create_clip_router(verify_session_token))
+app.include_router(crop_router, dependencies=[Depends(verify_session_token)])
 
 
 def is_valid_image_magic(data: bytes, content_type: str) -> bool:
@@ -112,9 +152,11 @@ def is_valid_image_magic(data: bytes, content_type: str) -> bool:
 def enforce_capture_retention_limit():
     try:
         files = [
-            os.path.join(CAPTURAS_DIR, f)
-            for f in os.listdir(CAPTURAS_DIR)
-            if os.path.isfile(os.path.join(CAPTURAS_DIR, f))
+            os.path.join(directory, entry)
+            for directory in (CAPTURES_DIR, LEGACY_CAPTURES_DIR)
+            if os.path.isdir(directory)
+            for entry in os.listdir(directory)
+            if os.path.isfile(os.path.join(directory, entry))
         ]
         if len(files) > MAX_STORED_CAPTURES:
             files.sort(key=os.path.getmtime)
@@ -130,183 +172,270 @@ def enforce_capture_retention_limit():
 @app.get("/")
 def root():
     return {
-        "servizio": "SwissSafeDrive",
-        "versione": "0.2.2",
-        "stato": "attivo",
-        "avviso": (
-            "Privacy by Design — demo non destinata a uso operativo. "
-            "Dati minimizzati nel contesto della dimostrazione."
+        "service": "SwissSafeDrive",
+        "version": "0.2.2",
+        "status": "active",
+        "notice": (
+            "Privacy by Design — demonstration only. "
+            "Data is minimized for the demonstration."
         ),
     }
 
 
 @app.get(
-    "/api/registros",
-    response_model=List[RegistroOut],
+    "/api/records",
+    response_model=List[RecordOut],
     dependencies=[Depends(verify_session_token)],
 )
-def listar_registros(db: Session = Depends(get_db)):
-    return db.query(Registro).order_by(Registro.timestamp.desc()).all()
+def list_records(db: Session = Depends(get_db)):
+    return db.query(Record).order_by(Record.timestamp.desc()).all()
 
 
 @app.get(
-    "/api/registros/{registro_id}",
-    response_model=RegistroOut,
+    "/api/records/{record_id}",
+    response_model=RecordOut,
     dependencies=[Depends(verify_session_token)],
 )
-def obtener_registro(registro_id: int, db: Session = Depends(get_db)):
-    reg = db.query(Registro).filter(Registro.id == registro_id).first()
-    if not reg:
-        raise HTTPException(status_code=404, detail="Registro non trovato")
-    return reg
+def get_record(record_id: int, db: Session = Depends(get_db)):
+    record = db.query(Record).filter(Record.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Record non trovato")
+    return record
 
 
 @app.patch(
-    "/api/registros/{registro_id}/decision",
-    response_model=RegistroOut,
+    "/api/records/{record_id}/decision",
+    response_model=RecordOut,
     dependencies=[Depends(verify_session_token)],
 )
-def tomar_decision(
-    registro_id: int,
+def submit_decision(
+    record_id: int,
     decision: DecisionIn,
     db: Session = Depends(get_db),
 ):
-    reg = db.query(Registro).filter(Registro.id == registro_id).first()
-    if not reg:
-        raise HTTPException(status_code=404, detail="Registro non trovato")
+    record = db.query(Record).filter(Record.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Record non trovato")
 
-    estados_validos = ["pendiente", "revisado", "confirmado", "descartado"]
-    if decision.estado not in estados_validos:
+    valid_states = ["pending", "reviewed", "confirmed", "discarded"]
+    if decision.state not in valid_states:
         raise HTTPException(
             status_code=400,
-            detail=f"Stato non valido. Usa: {estados_validos}",
+            detail=f"Invalid state. Use: {valid_states}",
         )
 
-    reg.estado = decision.estado
-    reg.agente_id = decision.agente_id
-    reg.fecha_decision = datetime.utcnow()
+    record.state = decision.state
+    record.operator_id = decision.operator_id
+    record.decision_at = datetime.now(UTC)
     db.commit()
-    db.refresh(reg)
-    return reg
+    db.refresh(record)
+    return record
 
 
 @app.get(
-    "/api/estadisticas",
-    response_model=EstadisticasOut,
+    "/api/statistics",
+    response_model=StatisticsOut,
     dependencies=[Depends(verify_session_token)],
 )
-def estadisticas(db: Session = Depends(get_db)):
-    total = db.query(func.count(Registro.id)).scalar() or 0
-    pendientes = (
-        db.query(func.count(Registro.id))
-        .filter(Registro.estado == "pendiente")
+def statistics(db: Session = Depends(get_db)):
+    total = db.query(func.count(Record.id)).scalar() or 0
+    pending = (
+        db.query(func.count(Record.id))
+        .filter(Record.state == "pending")
         .scalar()
         or 0
     )
-    revisados = (
-        db.query(func.count(Registro.id))
-        .filter(Registro.estado == "revisado")
+    reviewed = (
+        db.query(func.count(Record.id))
+        .filter(Record.state == "reviewed")
         .scalar()
         or 0
     )
-    confirmados = (
-        db.query(func.count(Registro.id))
-        .filter(Registro.estado == "confirmado")
+    confirmed = (
+        db.query(func.count(Record.id))
+        .filter(Record.state == "confirmed")
         .scalar()
         or 0
     )
-    descartados = (
-        db.query(func.count(Registro.id))
-        .filter(Registro.estado == "descartado")
+    discarded = (
+        db.query(func.count(Record.id))
+        .filter(Record.state == "discarded")
         .scalar()
         or 0
     )
-    media = db.query(func.avg(Registro.confianza)).scalar() or 0.0
+    average = db.query(func.avg(Record.confidence)).scalar() or 0.0
 
-    return EstadisticasOut(
+    return StatisticsOut(
         total=total,
-        pendientes=pendientes,
-        revisados=revisados,
-        confirmados=confirmados,
-        descartados=descartados,
-        confianza_media=round(float(media), 3),
+        pending=pending,
+        reviewed=reviewed,
+        confirmed=confirmed,
+        discarded=discarded,
+        average_confidence=round(float(average), 3),
     )
 
 
 @app.post(
-    "/api/capturas/upload",
-    response_model=RegistroOut,
+    "/api/captures/upload",
+    response_model=RecordOut,
     dependencies=[Depends(verify_session_token)],
 )
-async def subir_captura(
+async def upload_capture(
     file: UploadFile = File(...),
-    ubicacion: str = Form("Camera locale"),
-    confianza: float = Form(0.75),
+    location: str = Form("Local camera"),
+    confidence: float = Form(0.75),
     db: Session = Depends(get_db),
 ):
     content_type = (file.content_type or "").lower().strip()
     if content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=415,
-            detail="Formato file non supportato. Usa JPEG, PNG o WebP.",
+            detail="Unsupported file format. Use JPEG, PNG or WebP.",
         )
 
     contents = await file.read(MAX_UPLOAD_BYTES + 1)
     if not contents:
-        raise HTTPException(status_code=400, detail="File vuoto")
+        raise HTTPException(status_code=400, detail="Empty file")
     if len(contents) > MAX_UPLOAD_BYTES:
         raise HTTPException(
             status_code=413,
-            detail="File troppo grande (limite massimo 5 MB)",
+            detail="File exceeds the 5 MB limit",
         )
     if not is_valid_image_magic(contents, content_type):
         raise HTTPException(
             status_code=415,
-            detail="Contenuto file non valido per il tipo di immagine dichiarato",
+            detail="File contents do not match the declared image type",
         )
 
     uid_short = uuid.uuid4().hex[:6]
-    inf_id = f"inf_cam_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uid_short}"
+    event_id = f"inf_cam_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}_{uid_short}"
     ext = ALLOWED_CONTENT_TYPES[content_type]
-    filename = f"{inf_id}{ext}"
-    filepath = os.path.join(CAPTURAS_DIR, filename)
+    filename = f"{event_id}{ext}"
+    filepath = os.path.join(CAPTURES_DIR, filename)
 
-    os.makedirs(CAPTURAS_DIR, exist_ok=True)
+    os.makedirs(CAPTURES_DIR, exist_ok=True)
     with open(filepath, "wb") as f:
         f.write(contents)
 
     enforce_capture_retention_limit()
 
-    identificatore_demo = f"demo-tech-{uid_short}"
+    demo_id = f"demo-tech-{uid_short}"
 
-    reg = Registro(
-        inf_id=inf_id,
-        timestamp=datetime.utcnow(),
-        confianza=max(0.0, min(1.0, float(confianza))),
-        ubicacion=(ubicacion or "Camera locale")[:120],
-        identificatore_demo=identificatore_demo,
-        imagen_path=filename,
-        estado="pendiente",
-        origen="camara",
+    record = Record(
+        event_id=event_id,
+        timestamp=datetime.now(UTC),
+        confidence=max(0.0, min(1.0, float(confidence))),
+        location=(location or "Local camera")[:120],
+        demo_id=demo_id,
+        image_path=filename,
+        state="pending",
+        origin="camera",
     )
-    db.add(reg)
+    db.add(record)
     db.commit()
-    db.refresh(reg)
-    return reg
+    db.refresh(record)
+    return record
 
 
 @app.get(
-    "/api/imagenes/{registro_id}",
+    "/api/images/{record_id}",
     dependencies=[Depends(verify_session_token)],
 )
-def obtener_imagen(registro_id: int, db: Session = Depends(get_db)):
-    reg = db.query(Registro).filter(Registro.id == registro_id).first()
-    if not reg or not reg.imagen_path:
-        raise HTTPException(status_code=404, detail="Immagine non trovata")
+def get_image(record_id: int, db: Session = Depends(get_db)):
+    record = db.query(Record).filter(Record.id == record_id).first()
+    if not record or not record.image_path:
+        raise HTTPException(status_code=404, detail="Image not found")
 
-    safe_name = os.path.basename(reg.imagen_path)
-    filepath = os.path.join(CAPTURAS_DIR, safe_name)
-    if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="File immagine mancante")
+    safe_name = os.path.basename(record.image_path)
+    filepath = os.path.join(CAPTURES_DIR, safe_name)
+    if not os.path.isfile(filepath):
+        filepath = os.path.join(LEGACY_CAPTURES_DIR, safe_name)
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=404, detail="Image file missing")
 
     return FileResponse(filepath, media_type="image/jpeg")
+
+
+class ManualFlagIn(BaseModel):
+    flagged_manually: Literal[True]
+
+
+manual_flags: set[str] = set()
+
+
+def with_manual_flag(record):
+    if record["passId"] in manual_flags:
+        return {**record, "flagged_manually": True}
+    return record
+
+
+@app.get("/api/passes", dependencies=[Depends(verify_session_token)])
+def list_passes(clip: str | None = None, track_id: int | None = None):
+    return [
+        with_manual_flag(record) for record in load_passes().values()
+        if (clip is None or record["clip"]["id"] == clip)
+        and (track_id is None or track_id in record["track_ids"])
+    ]
+
+
+@app.get("/api/passes/{pass_id}", dependencies=[Depends(verify_session_token)])
+def get_pass(pass_id: str):
+    record = load_passes().get(pass_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Pass not found")
+    return with_manual_flag(record)
+
+
+@app.patch("/api/passes/{pass_id}", dependencies=[Depends(verify_session_token)])
+def flag_pass(pass_id: str, body: ManualFlagIn):
+    record = get_pass(pass_id)
+    manual_flags.add(pass_id)
+    return with_manual_flag(record)
+
+
+@app.patch("/api/passes/{pass_id}/flag", dependencies=[Depends(verify_session_token)])
+def update_pass_flag(pass_id: str, flag: FlagUpdateIn):
+    get_pass(pass_id)
+    if flag.flagged_manually:
+        manual_flags.add(pass_id)
+    else:
+        manual_flags.discard(pass_id)
+    return {"passId": pass_id, "flagged_manually": flag.flagged_manually}
+
+
+@app.get("/api/candidates", dependencies=[Depends(verify_session_token)])
+def list_candidates(db: Session = Depends(get_db)):
+    rows = []
+    for record in load_passes().values():
+        row = candidate_row(with_manual_flag(record))
+        if row is not None:
+            rows.append(row)
+
+    states = dict(
+        db.query(Record.event_id, Record.state)
+        .filter(Record.event_id.in_([row["passId"] for row in rows]))
+        .all()
+    )
+    return [{**row, "state": states.get(row["passId"], "pending")} for row in rows]
+
+
+@app.post(
+    "/api/passes/{pass_id}/record",
+    response_model=RecordOut,
+    dependencies=[Depends(verify_session_token)],
+)
+def open_pass_record(pass_id: str, db: Session = Depends(get_db)):
+    record = get_pass(pass_id)
+    db.execute(
+        insert(Record).values(
+            event_id=pass_id,
+            demo_id=pass_id,
+            location=record["clip"]["id"],
+            confidence=0.0,
+            origin="simulated",
+            notice=SIMULATED_NOTICE,
+        ).on_conflict_do_nothing(index_elements=[Record.event_id])
+    )
+    result = db.query(Record).filter(Record.event_id == pass_id).one()
+    db.commit()
+    return result

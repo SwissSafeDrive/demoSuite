@@ -18,7 +18,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:8765 http://127.0.0.1:8766 http://127.0.0.1:8767 http://127.0.0.1:8768 http://127.0.0.1:8769 http://127.0.0.1:8770; img-src 'self' data: blob: http://127.0.0.1:8765 http://127.0.0.1:8766 http://127.0.0.1:8767 http://127.0.0.1:8768 http://127.0.0.1:8769 http://127.0.0.1:8770; media-src 'self' blob: mediastream:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:8765 http://127.0.0.1:8766 http://127.0.0.1:8767 http://127.0.0.1:8768 http://127.0.0.1:8769 http://127.0.0.1:8770; img-src 'self' data: blob: http://127.0.0.1:8765 http://127.0.0.1:8766 http://127.0.0.1:8767 http://127.0.0.1:8768 http://127.0.0.1:8769 http://127.0.0.1:8770; media-src 'self' blob: mediastream: http://127.0.0.1:8765 http://127.0.0.1:8766 http://127.0.0.1:8767 http://127.0.0.1:8768 http://127.0.0.1:8769 http://127.0.0.1:8770; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
     }
   },
   "bundle": {

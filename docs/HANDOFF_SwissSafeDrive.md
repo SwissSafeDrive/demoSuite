@@ -221,3 +221,69 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 
 ### Siguiente acción recomendada
 - Utilizar `/Users/david/Desktop/SwissSafeDrive_Demo_FINAL/SwissSafeDrive.app` o `/Users/david/Desktop/SwissSafeDrive_Demo_FINAL/SwissSafeDrive_0.2.2_aarch64.dmg` para la demostración institucional.
+
+---
+
+## DemoSuite ticket #21
+
+- Exported 131 Passes with saved vehicle geometry, bridge Snapshots and three labelled simulated Candidates. Added local footage lookup, protected Pass routes, English record routes and a Vite browser session token.
+- Updated `app/README.md`, `app/src/api/client.js`, `app/src/pages/{CamaraEnVivo,Dashboard,RegistroDetalle}.jsx` and `app/src/pages/recordStateLabels.js`. Backend changes cover `backend/{main,models,schemas,backend_runner,seed,pass_fixture}.py`, `backend/fixtures/` and `backend/tests/`. Added `scripts/build_pass_fixture.py` and `scripts/locate_footage.py`.
+- `python -m pytest backend/tests` passed all 11 tests. The Vite production build passed. Headless Chrome loaded the registry against the local runner and saved a decision on a migrated 0.2.2 record. Capture upload, image retrieval and all three local clip lookups passed.
+- The fixture uses bridge frames 927 and 1051 for the second and third Candidates because the tracker-selected frames occur after the v5 windshield leaves view. The fixture README records the source frames and substitution.
+- Next action for the orchestrator is to integrate the signed ticket branch before starting the recorded-video player and crop batch. No outstanding ticket #21 implementation work.
+
+## DemoSuite ticket #20
+
+- Added native recorded playback, a clip chooser in the simulated case detail, frame-synced vehicle and windshield overlays, labelled simulated confidence, and a lower-front pixel blur for tracked vehicles. Local playback uses clip-scoped signed URLs and byte ranges.
+- Updated `app/src/{App.jsx,api/client.js,styles.css,pages/CaseDetail.jsx,pages/CamaraEnVivo.jsx,media/RecordedPlayer.jsx,media/videoOverlay.js}` and `app/src-tauri/tauri.conf.json`. Renamed `RegistroDetalle.jsx` to `CaseDetail.jsx`. Updated `backend/{main,clip_routes,footage,overlay}.py`, `backend/tests/test_overlay.py`, and `scripts/locate_footage.py`.
+- The full backend suite passed all 14 tests. The Vite build passed. Real headless Chrome playback and seek passed for all three clips at two viewport sizes, with overlay alignment and changed pixels in the plate regions. The local API passed signed URL, HEAD and byte-range checks.
+- Open verification is the packaged WebView. The clip chooser is independent of the legacy records, and the blur uses only vehicles with saved fixture geometry.
+- Next action for the orchestrator is to take the ticket through review and verify native playback and visible plate blur in the macOS WebView during the Evidence stage.
+
+---
+
+## DemoSuite ticket #22
+
+- Added a local batch that blurs tracked plates before warping fixture windshield quads with the locked pad. It publishes a time-indexed JPEG strip or a Not assessable status for each Pass. Restored the slim tracker environment at `/workspace/wt/venv`.
+- Added the session-protected crop metadata and JPEG routes. Changed `.gitignore`, `backend/main.py`, `backend/fixtures/README.md` and this handoff. Added `backend/crop_storage.py`, `backend/crop_routes.py`, `backend/tests/test_crops_api.py` and `scripts/precompute_windshield_crops.py`.
+- `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 15 tests, including real bridge-frame fetches, geometry and unavailable crops. Starlette reported one dependency deprecation warning.
+- Verified 8,890 local JPEGs for 93 Passes and Not assessable entries for 38 Passes in `/workspace/demo-map/windshield-crops/`. All 131 metadata requests and the three Candidate bridge image requests passed. No ticket implementation issues remain.
+- Next action for the orchestrator is to integrate the signed ticket branch and use the crop routes for the side panel in #23.
+
+## DemoSuite ticket #23
+
+- Tracked vehicle boxes open Single Case Analysis and switch the selected Pass on the same player. The side panel follows the displayed frame, supports 1–4× zoom with scrolling, and shows Not assessable when the crop is unusable or missing.
+- Manual promotion sets `flagged_manually` through the session-protected Pass API. The mark survives browser reloads during the backend process. The saved fixture classification remains available for distinguishing automatic and manual Candidates and for gating crop availability.
+- Changed `app/src/App.jsx`, `app/src/api/client.js`, `app/src/media/{RecordedPlayer.jsx,videoOverlay.js,WindshieldPanel.jsx}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `app/tests/vehicleSelection.test.js`, `backend/{main,crop_routes}.py`, `backend/tests/{test_crops_api,test_pass_promotion}.py` and this handoff.
+- The full backend suite passed 20 tests with one Starlette dependency deprecation warning. The Node hit-test passed and the Vite build succeeded. Chrome verified vehicle switching, playback, exact crop after seek, zoom, missing-crop display and manual flag retrieval. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-23-{candidate,not-assessable}.png`.
+- Manual flags reset when the backend restarts. Next, connect the Candidate list to the Pass selection and manual flag field during integration.
+
+## DemoSuite ticket #24
+
+- Reused the registry layout for the English Candidate list and translated the review console shell and live-camera page. The list uses bridge decisions or manual flags, shows labelled simulated scores, and opens the selected vehicle at its bridge frame.
+- Added an API route that opens a stable review Record for a Pass. The existing decision route saves the operator's review state and the list reflects it on return.
+- Changed `app/src/{App.jsx,api/client.js,media/RecordedPlayer.jsx,media/videoOverlay.js,pages/CaseDetail.jsx,pages/Dashboard.jsx,pages/recordStateLabels.js,styles.css}`, renamed `CamaraEnVivo.jsx` to `LiveCamera.jsx`, and changed `backend/{main,schemas,candidate_membership}.py`, `backend/tests/test_membership.py` and this handoff.
+- The full backend suite passed 23 tests with one Starlette deprecation warning. The Vite build passed. Real Chrome showed three Candidates and opened Cba002-068 at 48.12 seconds. All three review decisions persisted. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-24-*.png`.
+- The manual-flag API stores flags for the current backend process. During integration, use #23's durable flag source for membership and connect its open-Pass action to the same case entry point.
+
+## DemoSuite ticket #25
+
+- Completed Single Case Analysis with Pass-bounded playback, a scrubber and clickable behaviour stretches, a synchronized zoomable windshield, and the bridge Snapshot and flag time. The approach stays available as context. The observation summary labels simulated durations and omits distance pending #18. Manual promotion and human review use the existing APIs.
+- Changed `app/src/media/{PassTimeline.jsx,RecordedPlayer.jsx,WindshieldPanel.jsx,passAnalysis.js}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `backend/tests/{test_fixture,test_records_api,test_stretches}.py` and this handoff.
+- The full backend suite passed all 32 tests with one Starlette deprecation warning. The Node vehicle-selection test and Vite build passed. Real Chrome verified all three stretch seeks, zoom, playback through the Pass end, box selection, Not assessable, manual promotion and persistence of all three English review actions. Five captures are in `~/agent-notes/demoSuite-26/evidence/ticket-25-*.png`.
+- Manual flags are scoped to the backend process. The next step for the orchestrator is to integrate the signed branch and continue the spec workflow.
+
+## DemoSuite frontend purification (Group A)
+
+- Removed the unreachable generic case detail, captured-image view, clip chooser, and their unused client helpers and styles. Renamed the overlay draw order to describe vehicles with signal data drawing last.
+- Changed `app/src/pages/CaseDetail.jsx`, `app/src/media/RecordedPlayer.jsx`, `app/src/api/client.js`, `app/src/media/videoOverlay.js`, `app/src/styles.css` and this handoff.
+- `/workspace/demoSuite-26/ticket-21/.venv/bin/python -m pytest backend/tests` passed all 32 tests with one Starlette dependency deprecation warning. Hit-testing code was untouched.
+- The global instructions file at `/Users/david/dAvId_AI/AGENTS.md` was absent in this workspace. No implementation issues remain.
+- Next action for the orchestrator is to integrate the signed Group A commit and continue the review workflow.
+
+## DemoSuite review fix F2 (C5)
+
+- Moved the selected vehicle's dark and white strokes outside its coloured box in `app/src/media/videoOverlay.js`. Recorded the change in this handoff.
+- The full backend suite passed all 32 tests with one Starlette deprecation warning. The Node vehicle-selection test passed.
+- The global instructions file at `/Users/david/dAvId_AI/AGENTS.md` was absent. Visual validation remains pending.
+- Next action for the orchestrator is to verify the outline during recorded playback and integrate the signed fix.
