@@ -63,7 +63,7 @@ function RecordReview({ record, passId }) {
 
   const formatDate = (iso) => {
     const d = new Date(iso);
-    return d.toLocaleString("it-CH", {
+    return d.toLocaleString("en-CH", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -86,9 +86,9 @@ function RecordReview({ record, passId }) {
     try {
       const updated = await submitDecision(record.id, nextState);
       setState(updated.state);
-      setMessage(`Decisione registrata: ${recordStateLabels[nextState]}`);
+      setMessage(`Decision saved: ${recordStateLabels[nextState]}`);
     } catch (e) {
-      setError(`Impossibile aggiornare la decisione: ${e.message}`);
+      setError(`Could not save the decision: ${e.message}`);
     } finally {
       setSaving(false);
     }
@@ -117,26 +117,26 @@ function RecordReview({ record, passId }) {
         </div>
       ) : (
         <div className="case-detail-info">
-          <h3>Informazioni sul registro</h3>
+          <h3>Record information</h3>
           <div className="case-detail-info-grid">
             <div className="case-detail-info-item">
-              <strong>ID registro</strong>
+              <strong>Record ID</strong>
               {record.event_id}
             </div>
             <div className="case-detail-info-item">
-              <strong>Data e ora</strong>
+              <strong>Date and time</strong>
               {formatDate(record.timestamp)}
             </div>
             <div className="case-detail-info-item">
-              <strong>Luogo</strong>
+              <strong>Location</strong>
               {record.location}
             </div>
             <div className="case-detail-info-item">
-              <strong>Origine</strong>
-              {record.origin === "camera" ? "📷 Camera" : "🧪 Simulato"}
+              <strong>Source</strong>
+              {record.origin === "camera" ? "📷 Camera" : "🧪 Simulated"}
             </div>
             <div className="case-detail-info-item">
-              <strong>Confidenza IA</strong>
+              <strong>AI confidence</strong>
               <span
                 className={`record-badge ${getBadgeClass(record.confidence)}`}
                 style={{
@@ -145,28 +145,29 @@ function RecordReview({ record, passId }) {
                   marginTop: "4px",
                 }}
               >
+                {record.origin === "simulated" && "SIMULATED SIGNAL · "}
                 {(record.confidence * 100).toFixed(1)}%
               </span>
             </div>
             <div className="case-detail-info-item">
-              <strong>Identificatore tecnico demo</strong>
+              <strong>Demo technical identifier</strong>
               {record.demo_id || record.event_id}
             </div>
             <div className="case-detail-info-item">
-              <strong>Stato attuale</strong>
+              <strong>Current state</strong>
               <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
                 {recordStateLabels[state]}
               </span>
             </div>
             {record.operator_id && (
               <div className="case-detail-info-item">
-                <strong>Agente</strong>
+                <strong>Operator</strong>
                 {record.operator_id}
               </div>
             )}
             {record.decision_at && (
               <div className="case-detail-info-item">
-                <strong>Data decisione</strong>
+                <strong>Decision date</strong>
                 {formatDate(record.decision_at)}
               </div>
             )}
@@ -176,10 +177,9 @@ function RecordReview({ record, passId }) {
       )}
 
       <div className="case-detail-info">
-        <h3>Decisione dell'agente (validazione umana obbligatoria)</h3>
+        <h3>Operator decision (human review required)</h3>
         <p style={{ fontSize: "0.85rem", color: "#475569", marginBottom: "12px" }}>
-          Il sistema fornisce esclusivamente un supporto tecnico preliminare. La
-          decisione finale spetta sempre all'operatore umano.
+          The system provides preliminary technical assistance. The human operator makes the final decision.
         </p>
 
         {message && (
@@ -196,31 +196,31 @@ function RecordReview({ record, passId }) {
 
         <div className="case-detail-actions">
           <button
-            className="btn-descartar"
+            className="btn-discard"
             onClick={() => saveDecision("discarded")}
             disabled={saving}
           >
-            {saving ? "…" : "Scarta"}
+            {saving ? "…" : "Discard"}
           </button>
           <button
-            className="btn-revisar"
+            className="btn-mark-for-review"
             onClick={() => saveDecision("reviewed")}
             disabled={saving}
           >
-            {saving ? "…" : "Marca per revisione"}
+            {saving ? "…" : "Mark for review"}
           </button>
           <button
-            className="btn-confirmar"
+            className="btn-confirm"
             onClick={() => saveDecision("confirmed")}
             disabled={saving}
           >
-            {saving ? "…" : "Conferma infrazione"}
+            {saving ? "…" : "Confirm infraction"}
           </button>
         </div>
       </div>
 
       <div className="case-detail-note">
-        <strong>Nota informativa:</strong> {record.notice}
+        <strong>Information:</strong> {record.notice}
       </div>
     </>
   );

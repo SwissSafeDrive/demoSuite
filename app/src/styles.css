@@ -301,17 +301,17 @@ body {
   opacity: 0.9;
 }
 
-.btn-descartar {
+.btn-discard {
   background: #e5e7eb;
   color: #374151;
 }
 
-.btn-revisar {
+.btn-mark-for-review {
   background: #f59e0b;
   color: white;
 }
 
-.btn-confirmar {
+.btn-confirm {
   background: #dc2626;
   color: white;
 }
@@ -456,4 +456,124 @@ body {
   .recorded-analysis.with-windshield {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.pass-timeline {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #dbe2ea;
+}
+
+.recorded-analysis.with-windshield .windshield-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.pass-playback,
+.pass-time-bounds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pass-timeline input[type="range"] {
+  width: 100%;
+}
+
+.pass-stretch-track {
+  position: relative;
+  height: 12px;
+  border-radius: 4px;
+  background: #dbe2ea;
+}
+
+.pass-stretch-track button {
+  position: absolute;
+  height: 100%;
+  min-width: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: #a34716;
+}
+
+.pass-stretches {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+
+.pass-stretches button {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.simulated-signal {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff0d6;
+  color: #713900;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bridge-snapshot {
+  margin: 8px 0 0;
+}
+
+.bridge-snapshot img {
+  display: block;
+  width: 100%;
+}
+
+.bridge-snapshot figcaption {
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .recorded-analysis.with-windshield .windshield-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .pass-timeline {
+    grid-row: auto;
+  }
+}
+
+.pass-playback button,
+.pass-stretches button,
+.windshield-case button {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pass-playback button:hover,
+.pass-stretches button:hover,
+.windshield-case button:not(:disabled):hover {
+  background: #edf2fa;
+}
+
+.windshield-case button:disabled {
+  opacity: 0.7;
+  cursor: default;
 }

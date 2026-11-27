@@ -265,3 +265,10 @@ No instalar ni configurar agentes adicionales hasta decidir qué parte debe asum
 - Changed `app/src/{App.jsx,api/client.js,media/RecordedPlayer.jsx,media/videoOverlay.js,pages/CaseDetail.jsx,pages/Dashboard.jsx,pages/recordStateLabels.js,styles.css}`, renamed `CamaraEnVivo.jsx` to `LiveCamera.jsx`, and changed `backend/{main,schemas,candidate_membership}.py`, `backend/tests/test_membership.py` and this handoff.
 - The full backend suite passed 23 tests with one Starlette deprecation warning. The Vite build passed. Real Chrome showed three Candidates and opened Cba002-068 at 48.12 seconds. All three review decisions persisted. Evidence is in `~/agent-notes/demoSuite-26/evidence/ticket-24-*.png`.
 - The manual-flag API stores flags for the current backend process. During integration, use #23's durable flag source for membership and connect its open-Pass action to the same case entry point.
+
+## DemoSuite ticket #25
+
+- Completed Single Case Analysis with Pass-bounded playback, a scrubber and clickable behaviour stretches, a synchronized zoomable windshield, and the bridge Snapshot and flag time. The approach stays available as context. The observation summary labels simulated durations and omits distance pending #18. Manual promotion and human review use the existing APIs.
+- Changed `app/src/media/{PassTimeline.jsx,RecordedPlayer.jsx,WindshieldPanel.jsx,passAnalysis.js}`, `app/src/pages/CaseDetail.jsx`, `app/src/styles.css`, `backend/tests/{test_fixture,test_records_api,test_stretches}.py` and this handoff.
+- The full backend suite passed all 32 tests with one Starlette deprecation warning. The Node vehicle-selection test and Vite build passed. Real Chrome verified all three stretch seeks, zoom, playback through the Pass end, box selection, Not assessable, manual promotion and persistence of all three English review actions. Five captures are in `~/agent-notes/demoSuite-26/evidence/ticket-25-*.png`.
+- Manual flags are scoped to the backend process. The next step for the orchestrator is to integrate the signed branch and continue the spec workflow.
