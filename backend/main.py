@@ -63,7 +63,8 @@ def ensure_schema():
 ensure_schema()
 
 DATA_DIR = os.environ.get("SSD_DATA_DIR", os.path.dirname(__file__))
-CAPTURES_DIR = os.path.join(DATA_DIR, "capturas")
+CAPTURES_DIR = os.path.join(DATA_DIR, "captures")
+LEGACY_CAPTURES_DIR = os.path.join(DATA_DIR, "capturas")
 os.makedirs(CAPTURES_DIR, exist_ok=True)
 
 SESSION_TOKEN = os.environ.get("SSD_SESSION_TOKEN") or secrets.token_hex(32)
@@ -77,14 +78,15 @@ ALLOWED_CONTENT_TYPES = {
 
 
 def cleanup_temp_captures():
-    try:
-        if os.path.isdir(CAPTURES_DIR):
-            for entry in os.listdir(CAPTURES_DIR):
-                full_path = os.path.join(CAPTURES_DIR, entry)
-                if os.path.isfile(full_path):
-                    os.remove(full_path)
-    except OSError:
-        pass
+    for directory in (CAPTURES_DIR, LEGACY_CAPTURES_DIR):
+        try:
+            if os.path.isdir(directory):
+                for entry in os.listdir(directory):
+                    full_path = os.path.join(directory, entry)
+                    if os.path.isfile(full_path):
+                        os.remove(full_path)
+        except OSError:
+            pass
 
 
 @asynccontextmanager
@@ -150,9 +152,11 @@ def is_valid_image_magic(data: bytes, content_type: str) -> bool:
 def enforce_capture_retention_limit():
     try:
         files = [
-            os.path.join(CAPTURES_DIR, f)
-            for f in os.listdir(CAPTURES_DIR)
-            if os.path.isfile(os.path.join(CAPTURES_DIR, f))
+            os.path.join(directory, entry)
+            for directory in (CAPTURES_DIR, LEGACY_CAPTURES_DIR)
+            if os.path.isdir(directory)
+            for entry in os.listdir(directory)
+            if os.path.isfile(os.path.join(directory, entry))
         ]
         if len(files) > MAX_STORED_CAPTURES:
             files.sort(key=os.path.getmtime)
@@ -344,7 +348,9 @@ def get_image(record_id: int, db: Session = Depends(get_db)):
 
     safe_name = os.path.basename(record.image_path)
     filepath = os.path.join(CAPTURES_DIR, safe_name)
-    if not os.path.exists(filepath):
+    if not os.path.isfile(filepath):
+        filepath = os.path.join(LEGACY_CAPTURES_DIR, safe_name)
+    if not os.path.isfile(filepath):
         raise HTTPException(status_code=404, detail="Image file missing")
 
     return FileResponse(filepath, media_type="image/jpeg")

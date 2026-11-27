@@ -1,4 +1,6 @@
 import json
+import os
+from pathlib import Path
 
 import pytest
 
@@ -61,3 +63,30 @@ def test_pass_review_survives_seeking_from_bridge_to_approach(client, tmp_path, 
         reopened.raise_for_status()
         assert reopened.json()["id"] == opened.json()["id"]
         assert reopened.json()["state"] == state
+
+
+def test_capture_upload_and_legacy_image_lookup(client):
+    image = b"\xff\xd8\xffcapture"
+    uploaded = client.post(
+        "/api/captures/upload",
+        headers=SESSION,
+        files={"file": ("capture.jpg", image, "image/jpeg")},
+    )
+    assert uploaded.status_code == 200
+    record = uploaded.json()
+    data_dir = Path(os.environ["SSD_DATA_DIR"])
+    capture = data_dir / "captures" / record["image_path"]
+    assert capture.read_bytes() == image
+
+    legacy_dir = data_dir / "capturas"
+    legacy_dir.mkdir(exist_ok=True)
+    legacy_capture = legacy_dir / capture.name
+    legacy_image = b"\xff\xd8\xfflegacy capture"
+    legacy_capture.write_bytes(legacy_image)
+
+    url = f"/api/images/{record['id']}"
+    assert client.get(url, headers=SESSION).content == image
+    capture.unlink()
+    response = client.get(url, headers=SESSION)
+    assert response.status_code == 200
+    assert response.content == legacy_image
