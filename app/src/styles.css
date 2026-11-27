@@ -173,30 +173,6 @@ body {
   font-weight: 700;
 }
 
-.record-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: white;
-  text-transform: uppercase;
-}
-
-.badge-high {
-  background: #dc2626;
-}
-
-.badge-medium {
-  background: #f59e0b;
-}
-
-.badge-low {
-  background: #6b7280;
-}
-
 .case-detail-container {
   max-width: 900px;
   margin: 0 auto;
@@ -225,26 +201,6 @@ body {
 
 .case-detail-header h2 {
   font-size: 1.3rem;
-}
-
-.case-detail-image {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.case-detail-image img {
-  width: 100%;
-  display: block;
-}
-
-.case-detail-image-placeholder {
-  padding: 60px;
-  text-align: center;
-  color: #9ca3af;
-  background: #f3f4f6;
 }
 
 .case-detail-info {
@@ -355,19 +311,6 @@ body {
   background: white;
   color: #1e3a8a;
   border-color: white;
-}
-
-/* Imagen real del registro */
-.case-detail-capture {
-  background: black;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.case-detail-capture img {
-  width: 100%;
-  display: block;
 }
 
 .case-detail-footage {

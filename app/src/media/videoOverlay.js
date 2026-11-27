@@ -116,12 +116,11 @@ export function drawVideoOverlay(canvas, video, sample, playback, time, selected
       blurPlate(context, video, sample, box, clip);
     }
 
-    // Candidate strokes remain visible when detections share the same box.
-    const ordered = [...vehicles].sort((a, b) => Number(!!a.signal) - Number(!!b.signal));
+    const vehiclesWithSignalsLast = [...vehicles].sort((a, b) => Number(!!a.signal) - Number(!!b.signal));
     const unit = window.devicePixelRatio / scaleX;
     context.lineWidth = 2 * unit;
     context.font = `600 ${12 * unit}px system-ui`;
-    for (const { box, quad, boxColor, quadColor, signal } of ordered) {
+    for (const { box, quad, boxColor, quadColor, signal } of vehiclesWithSignalsLast) {
       const [x1, y1, x2, y2] = box;
       context.strokeStyle = boxColor;
       context.strokeRect(x1, y1, x2 - x1, y2 - y1);

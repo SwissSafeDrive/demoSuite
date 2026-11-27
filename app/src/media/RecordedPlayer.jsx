@@ -4,10 +4,8 @@ import { drawVideoOverlay, frameAtTime, vehicleAtPoint } from "./videoOverlay";
 import WindshieldPanel from "./WindshieldPanel";
 import PassTimeline from "./PassTimeline";
 
-const CLIPS = ["Cba002", "Cba052", "Cba065"];
-
 function ClipVideo({ playback, pass, seekTime, onOpenPass }) {
-  const passId = pass?.passId;
+  const passId = pass.passId;
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const displayedTime = useRef(null);
@@ -33,7 +31,7 @@ function ClipVideo({ playback, pass, seekTime, onOpenPass }) {
       draw();
       const shownFrame = frameAtTime(time, playback.clip.fps);
       setFrame(shownFrame);
-      if (pass && !video.paused && shownFrame >= pass.end.frame) {
+      if (!video.paused && shownFrame >= pass.end.frame) {
         video.pause();
         if (shownFrame > pass.end.frame) video.currentTime = pass.end.time_s;
       }
@@ -119,22 +117,19 @@ function ClipVideo({ playback, pass, seekTime, onOpenPass }) {
   return (
     <>
       {(error || playError) && <p role="alert">Recorded footage could not be played.</p>}
-      <div className={passId ? "recorded-analysis with-windshield" : "recorded-analysis"}>
+      <div className="recorded-analysis with-windshield">
         <div className="recorded-player">
           <video
             ref={videoRef}
             crossOrigin="anonymous"
             src={playback.mediaUrl}
             aria-label={`Recorded footage ${playback.clip.id}`}
-            controls={!pass}
             controlsList="nofullscreen nodownload noremoteplayback"
             disablePictureInPicture
             disableRemotePlayback
             playsInline
             preload="auto"
-            onLoadedMetadata={() => {
-              if (pass) seek(seekTime ?? pass.start.time_s);
-            }}
+            onLoadedMetadata={() => seek(seekTime ?? pass.start.time_s)}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
             onEnded={() => setPlaying(false)}
@@ -143,8 +138,8 @@ function ClipVideo({ playback, pass, seekTime, onOpenPass }) {
           />
           <canvas ref={canvasRef} aria-hidden="true" />
         </div>
-        {pass && <WindshieldPanel pass={pass} frame={frame} playing={playing} onSeek={seek} />}
-        {pass && <PassTimeline pass={pass} frame={frame ?? seekFrame} playing={playing} onTogglePlayback={togglePlayback} onSeek={seek} />}
+        <WindshieldPanel pass={pass} frame={frame} playing={playing} onSeek={seek} />
+        <PassTimeline pass={pass} frame={frame ?? seekFrame} playing={playing} onTogglePlayback={togglePlayback} onSeek={seek} />
       </div>
     </>
   );
@@ -161,34 +156,22 @@ function SelectedClip({ clipId, passId, seekTime, onOpenPass }) {
       (result) => { if (active) setPlayback(result); },
       () => { if (active) setError(true); },
     );
-    if (passId) {
-      getPass(passId).then(
-        (result) => { if (active) setPass(result); },
-        () => { if (active) setError(true); },
-      );
-    }
+    getPass(passId).then(
+      (result) => { if (active) setPass(result); },
+      () => { if (active) setError(true); },
+    );
     return () => { active = false; };
   }, [clipId, passId]);
 
   if (error) return <p role="alert">Recorded footage is unavailable.</p>;
-  if (!playback || (passId && !pass)) return <p role="status">Loading recorded footage…</p>;
+  if (!playback || !pass) return <p role="status">Loading recorded footage…</p>;
   return <ClipVideo playback={playback} pass={pass} seekTime={seekTime} onOpenPass={onOpenPass} />;
 }
 
-export default function RecordedPlayer({ passId, initialClipId, seekTime, onOpenPass }) {
-  const [chosenClip, setClipId] = useState(CLIPS[0]);
-  const clipId = initialClipId ?? chosenClip;
+export default function RecordedPlayer({ passId, clipId, seekTime, onOpenPass }) {
   return (
     <section className="case-detail-footage">
-      {!passId && (
-        <label>
-          Demo footage
-          <select value={clipId} onChange={(event) => setClipId(event.target.value)}>
-            {CLIPS.map((clip) => <option key={clip}>{clip}</option>)}
-          </select>
-        </label>
-      )}
-      <SelectedClip key={passId ?? clipId} clipId={clipId} passId={passId} seekTime={seekTime} onOpenPass={onOpenPass} />
+      <SelectedClip key={passId} clipId={clipId} passId={passId} seekTime={seekTime} onOpenPass={onOpenPass} />
     </section>
   );
 }
