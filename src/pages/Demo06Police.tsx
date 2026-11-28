@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { pasteSas, retryAssets } from "../demos/police/api";
 import { deriveAssetState } from "../demos/police/asset-state";
+import CandidateList, { type PassSelection } from "../demos/police/CandidateList";
 import { useAssetStatus } from "../demos/police/use-asset-status";
 import "../demos/police/style.css";
 
@@ -34,10 +35,22 @@ function RunLocally() {
   );
 }
 
+function CasePlaceholder({ passId, onBack }: { passId: string; onBack: () => void }) {
+  return (
+    <>
+      <h2>{passId}</h2>
+      <button type="button" onClick={onBack}>
+        Back to Candidate list
+      </button>
+    </>
+  );
+}
+
 export default function Demo06Police() {
   const { status, statusFailed, refresh } = useAssetStatus();
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [selection, setSelection] = useState<PassSelection | null>(null);
   const view = deriveAssetState(status);
 
   async function runAction(action: () => Promise<{ ok: true }>, failureMessage: string) {
@@ -80,7 +93,10 @@ export default function Demo06Police() {
 
       <main className="police-content">
         <h1>Police Candidate Review</h1>
-        <section className="police-panel" aria-label="Demo assets">
+        <section
+          className="police-panel"
+          aria-label={view.kind === "ready" && !statusFailed ? (selection ? "Selected Pass" : "Candidate list") : "Demo assets"}
+        >
           {view.kind === "run-locally" ? (
             <RunLocally />
           ) : statusFailed ? (
@@ -142,7 +158,13 @@ export default function Demo06Police() {
             </>
           )}
 
-          {!statusFailed && view.kind === "ready" && <h2>Assets ready</h2>}
+          {!statusFailed &&
+            view.kind === "ready" &&
+            (selection ? (
+              <CasePlaceholder passId={selection.passId} onBack={() => setSelection(null)} />
+            ) : (
+              <CandidateList onOpenPass={setSelection} />
+            ))}
           {actionError && <p role="alert">{actionError}</p>}
         </section>
       </main>

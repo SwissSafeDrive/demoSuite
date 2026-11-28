@@ -1,0 +1,108 @@
+.police-panel .police-candidate-heading {
+  color: #e30613;
+}
+
+.police-candidate-counts,
+.police-candidate-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.police-candidate-counts {
+  margin: 0;
+  padding-block: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.police-candidate-counts dt,
+.police-candidate-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.police-candidate-counts dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.police-candidate-filters label {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.police-candidate-filters input,
+.police-candidate-filters select {
+  min-height: 36px;
+  font: inherit;
+}
+
+.police-candidate-filters select,
+.police-candidate-filters input[type="search"] {
+  padding: 4px 8px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  background: #fff;
+  color: inherit;
+}
+
+.police-candidate-filters input[type="range"] {
+  accent-color: #e30613;
+}
+
+.police-candidate-table-wrap {
+  overflow-x: auto;
+}
+
+.police-candidate-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.police-candidate-table th,
+.police-candidate-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.police-candidate-table tbody tr {
+  position: relative;
+}
+
+.police-candidate-table tbody tr:hover,
+.police-candidate-table tbody tr:focus-within {
+  background: #fff4f4;
+}
+
+.police-panel .police-candidate-open {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #b6000b;
+}
+
+.police-candidate-open::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.police-candidate-tag {
+  display: table;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
