@@ -1,5 +1,3 @@
-"""Locate demo clips in the configured footage directory."""
-
 from .asset_paths import footage_directory
 
 CLIPS = ("Cba002", "Cba052", "Cba065")

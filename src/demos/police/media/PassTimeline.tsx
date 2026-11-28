@@ -15,7 +15,7 @@ export default function PassTimeline({ pass, frame, playing, onTogglePlayback, o
   const { start, end, clip } = pass;
   const stretches = behaviourStretches(pass);
   const currentFrame = frame ?? start.frame;
-  const span = Math.max(1, end.frame - start.frame + 1);
+  const span = end.frame - start.frame + 1;
 
   return (
     <section className="pass-timeline" aria-label="Whole Pass timeline">

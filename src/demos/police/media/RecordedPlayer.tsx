@@ -32,13 +32,13 @@ function ClipVideo({ playback, pass, seekTime, onOpenPass, flagControls }: Recor
     const hasVideoCallbacks = typeof video.requestVideoFrameCallback === "function";
     let frameId = 0;
 
-    function draw() {
-      if (!video || !canvas || displayedTime.current === null) return;
+    const draw = () => {
+      if (displayedTime.current === null) return;
       drawVideoOverlay(canvas, video, sample, playback, displayedTime.current, passId);
-    }
+    };
 
-    function showFrame(time: number) {
-      if (!video || video.seeking || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+    const showFrame = (time: number) => {
+      if (video.seeking || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
       displayedTime.current = time;
       draw();
       const shownFrame = frameAtTime(time, fps);
@@ -47,7 +47,7 @@ function ClipVideo({ playback, pass, seekTime, onOpenPass, flagControls }: Recor
         video.pause();
         if (shownFrame > end.frame) video.currentTime = end.time_s;
       }
-    }
+    };
 
     const drawCurrent = () => showFrame(video.currentTime);
     const startSeek = () => {
