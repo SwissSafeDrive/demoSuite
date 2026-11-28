@@ -8,7 +8,9 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 
 export default [
-  { ignores: ["dist", "packages", "landing"] },
+  {
+    ignores: ["dist", "packages", "landing", "backend/", "**/__pycache__/**", "**/.pytest_cache/**", ".venv/**", "**/*.pyc"],
+  },
   js.configs.recommended,
   ...tseslint.configs.strict,
   prettierConfig,
