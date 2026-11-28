@@ -76,18 +76,6 @@ export default function PassTimeline({ pass, frame, playing, onTogglePlayback, o
           ))}
         </ul>
       )}
-      <div className="pass-observation">
-        <h3>Observation summary</h3>
-        {stretches.length > 0 ? (
-          stretches.map((stretch) => (
-            <p key={`${stretch.name}-${stretch.seekFrame}`}>
-              {stretch.name} for {seconds(stretch.duration)} <span className="simulated-signal">{stretch.label}</span>
-            </p>
-          ))
-        ) : (
-          <p>{pass.classification === "Not assessable" ? "Not assessable" : "No behaviour stretches were annotated for this Pass."}</p>
-        )}
-      </div>
     </section>
   );
 }

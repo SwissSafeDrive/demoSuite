@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { getCandidates } from "./api";
 import { formatCandidateRow, minimumSignalLabel, reviewStateLabels } from "./candidate-display";
-import type { Candidate } from "./types";
+import type { Candidate, PassSelection } from "./types";
 import "./candidates.css";
-
-export type PassSelection = Pick<Candidate, "passId" | "clipId" | "seekTime">;
 
 type CandidateLoad = { kind: "loading" } | { kind: "error" } | { kind: "ready"; candidates: Candidate[] };
 

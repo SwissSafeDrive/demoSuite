@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchWindshieldCrop, flagPass, getPassCrops } from "../api";
+import { fetchWindshieldCrop, getPassCrops } from "../api";
 import type { Pass, PassCrops } from "../types";
 import "./media.css";
 
 type CropFrames = Map<number, string>;
 type Seek = (time: number) => void;
-type WindshieldPanelProps = {
+export type FlagControls = {
+  onFlag: () => void;
+  flagDisabled: boolean;
+  flagError: boolean;
+};
+
+type WindshieldPanelProps = FlagControls & {
   pass: Pass;
   frame: number | null;
   playing: boolean;
@@ -91,13 +97,10 @@ function Snapshot({ frames, snapshot, onSeek }: { frames: CropFrames; snapshot: 
   );
 }
 
-export default function WindshieldPanel({ pass, frame, playing, onSeek }: WindshieldPanelProps) {
-  const { passId, classification } = pass;
-  const [flaggedManually, setFlaggedManually] = useState(pass.flagged_manually);
+export default function WindshieldPanel({ pass, frame, playing, onSeek, onFlag, flagDisabled, flagError }: WindshieldPanelProps) {
+  const { passId, flagged_manually: flaggedManually } = pass;
   const [crops, setCrops] = useState<PassCrops["frames"] | null>(null);
   const [cropError, setCropError] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [flagError, setFlagError] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -116,26 +119,12 @@ export default function WindshieldPanel({ pass, frame, playing, onSeek }: Windsh
 
   const frames = useMemo(() => new Map(crops?.map(({ frame, url }) => [frame, url])), [crops]);
 
-  async function promote() {
-    setSaving(true);
-    setFlagError(false);
-    try {
-      const updated = await flagPass(passId);
-      setFlaggedManually(updated.flagged_manually);
-    } catch {
-      setFlagError(true);
-    } finally {
-      setSaving(false);
-    }
-  }
-
   const { flagTime, snapshots } = bridgeDecision(pass);
 
   return (
-    <aside className="windshield-panel" aria-label="Single Case Analysis">
+    <aside className="windshield-panel" aria-label="Windshield and bridge Snapshots">
       <div className="windshield-case">
-        <h3>{passId}</h3>
-        <p>{flaggedManually ? "Candidate · Flagged manually" : classification === "unflagged" ? "Unflagged" : classification}</p>
+        <h3>Windshield</h3>
       </div>
       {cropError ? (
         <div className="windshield-viewport">
@@ -149,7 +138,7 @@ export default function WindshieldPanel({ pass, frame, playing, onSeek }: Windsh
         <WindshieldCrop frames={frames} frame={frame} playing={playing} />
       )}
       <div className="windshield-case">
-        <button type="button" onClick={promote} disabled={saving || flaggedManually}>
+        <button type="button" onClick={onFlag} disabled={flagDisabled || flaggedManually}>
           {flaggedManually ? "Flagged manually" : "Flag manually"}
         </button>
         {flagError && <p role="alert">The manual flag could not be saved.</p>}

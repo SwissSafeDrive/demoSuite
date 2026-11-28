@@ -129,10 +129,11 @@
   background: #f3f3f3;
 }
 
-.pass-stretch-track button {
+.pass-timeline .pass-stretch-track button {
   position: absolute;
   height: 100%;
   min-width: 6px;
+  min-height: 0;
   padding: 0;
   border: 1px solid #999;
   border-radius: inherit;
@@ -140,8 +141,8 @@
   cursor: pointer;
 }
 
-.pass-stretch-track button:hover,
-.pass-stretch-track button[aria-current="true"] {
+.pass-timeline .pass-stretch-track button:hover,
+.pass-timeline .pass-stretch-track button[aria-current="true"] {
   border-color: #e30613;
   background: #e30613;
 }

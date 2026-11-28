@@ -1,0 +1,33 @@
+.police-content.case-content {
+  max-width: 1320px;
+}
+
+.case-analysis {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.case-analysis .case-back {
+  margin-bottom: 12px;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.case-review,
+.case-observation {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.case-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.case-observation ul {
+  padding-left: 20px;
+}

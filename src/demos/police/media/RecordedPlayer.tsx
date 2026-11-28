@@ -1,23 +1,19 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { getClipPlayback, getPass } from "../api";
-import type { ClipPlayback, Pass } from "../types";
+import { getClipPlayback } from "../api";
+import type { ClipPlayback, Pass, PassSelection } from "../types";
 import { drawVideoOverlay, frameAtTime, vehicleAtPoint } from "./videoOverlay";
-import WindshieldPanel from "./WindshieldPanel";
+import WindshieldPanel, { type FlagControls } from "./WindshieldPanel";
 import PassTimeline from "./PassTimeline";
 import "./media.css";
 
-type PlaybackTarget = { passId: string; clipId: string; seekTime: number };
-type RecordedPlayerProps = Omit<PlaybackTarget, "seekTime"> & {
-  seekTime?: number | null;
-  onOpenPass: (pass: PlaybackTarget) => void;
+type RecordedPlayerProps = {
+  pass: Pass;
+  seekTime: number;
+  onOpenPass: (target: PassSelection) => void;
+  flagControls: FlagControls;
 };
 
-function ClipVideo({
-  playback,
-  pass,
-  seekTime,
-  onOpenPass,
-}: Pick<RecordedPlayerProps, "seekTime" | "onOpenPass"> & { playback: ClipPlayback; pass: Pass }) {
+function ClipVideo({ playback, pass, seekTime, onOpenPass, flagControls }: RecordedPlayerProps & { playback: ClipPlayback }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const displayedTime = useRef<number | null>(null);
@@ -25,7 +21,7 @@ function ClipVideo({
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState(false);
   const { fps } = playback.clip;
-  const initialTime = seekTime ?? pass.start.time_s;
+  const { passId, end } = pass;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -38,7 +34,7 @@ function ClipVideo({
 
     function draw() {
       if (!video || !canvas || displayedTime.current === null) return;
-      drawVideoOverlay(canvas, video, sample, playback, displayedTime.current, pass.passId);
+      drawVideoOverlay(canvas, video, sample, playback, displayedTime.current, passId);
     }
 
     function showFrame(time: number) {
@@ -47,9 +43,9 @@ function ClipVideo({
       draw();
       const shownFrame = frameAtTime(time, fps);
       setFrame(shownFrame);
-      if (!video.paused && shownFrame >= pass.end.frame) {
+      if (!video.paused && shownFrame >= end.frame) {
         video.pause();
-        if (shownFrame > pass.end.frame) video.currentTime = pass.end.time_s;
+        if (shownFrame > end.frame) video.currentTime = end.time_s;
       }
     }
 
@@ -82,19 +78,19 @@ function ClipVideo({
       video.removeEventListener("timeupdate", drawCurrent);
       if (hasVideoCallbacks) video.cancelVideoFrameCallback(frameId);
     };
-  }, [fps, pass, playback]);
+  }, [end, fps, passId, playback]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     const seekToSelection = () => {
       video.pause();
-      video.currentTime = initialTime;
+      video.currentTime = seekTime;
     };
     if (video.readyState >= HTMLMediaElement.HAVE_METADATA) seekToSelection();
     else video.addEventListener("loadedmetadata", seekToSelection, { once: true });
     return () => video.removeEventListener("loadedmetadata", seekToSelection);
-  }, [initialTime]);
+  }, [seekTime]);
 
   function seek(time: number) {
     const video = videoRef.current;
@@ -157,21 +153,22 @@ function ClipVideo({
           />
           <canvas ref={canvasRef} aria-hidden="true" />
         </div>
-        <WindshieldPanel pass={pass} frame={frame} playing={playing} onSeek={seek} />
+        <WindshieldPanel pass={pass} frame={frame} playing={playing} onSeek={seek} {...flagControls} />
         <PassTimeline pass={pass} frame={frame} playing={playing} onTogglePlayback={togglePlayback} onSeek={seek} />
       </div>
     </>
   );
 }
 
-function SelectedClip({ passId, clipId, seekTime, onOpenPass }: RecordedPlayerProps) {
-  const [result, setResult] = useState<{ playback: ClipPlayback; pass: Pass } | "error" | null>(null);
+export default function RecordedPlayer(props: RecordedPlayerProps) {
+  const clipId = props.pass.clip.id;
+  const [result, setResult] = useState<ClipPlayback | "error" | null>(null);
 
   useEffect(() => {
     let active = true;
-    Promise.all([getClipPlayback(clipId), getPass(passId)]).then(
-      ([playback, pass]) => {
-        if (active) setResult({ playback, pass });
+    void getClipPlayback(clipId).then(
+      (playback) => {
+        if (active) setResult(playback);
       },
       () => {
         if (active) setResult("error");
@@ -180,17 +177,17 @@ function SelectedClip({ passId, clipId, seekTime, onOpenPass }: RecordedPlayerPr
     return () => {
       active = false;
     };
-  }, [clipId, passId]);
+  }, [clipId]);
 
-  if (result === "error") return <p role="alert">Recorded footage is unavailable.</p>;
-  if (!result) return <p role="status">Loading recorded footage…</p>;
-  return <ClipVideo {...result} seekTime={seekTime} onOpenPass={onOpenPass} />;
-}
-
-export default function RecordedPlayer(props: RecordedPlayerProps) {
   return (
     <section className="case-detail-footage" aria-label="Recorded Pass playback">
-      <SelectedClip key={`${props.clipId}/${props.passId}`} {...props} />
+      {result === "error" ? (
+        <p role="alert">Recorded footage is unavailable.</p>
+      ) : result ? (
+        <ClipVideo {...props} playback={result} />
+      ) : (
+        <p role="status">Loading recorded footage…</p>
+      )}
     </section>
   );
 }

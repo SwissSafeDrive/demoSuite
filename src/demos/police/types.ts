@@ -36,6 +36,8 @@ export type Candidate = ManualFlag & {
   signal: (Signal & { color: string }) | null;
 };
 
+export type PassSelection = Pick<Candidate, "passId" | "clipId" | "seekTime">;
+
 export type Pass = ManualFlag & {
   clip: Clip;
   start: Moment;

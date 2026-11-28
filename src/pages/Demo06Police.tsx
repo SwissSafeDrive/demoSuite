@@ -2,7 +2,9 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { pasteSas, retryAssets } from "../demos/police/api";
 import { deriveAssetState } from "../demos/police/asset-state";
-import CandidateList, { type PassSelection } from "../demos/police/CandidateList";
+import CandidateList from "../demos/police/CandidateList";
+import CaseAnalysis from "../demos/police/CaseAnalysis";
+import type { PassSelection } from "../demos/police/types";
 import { useAssetStatus } from "../demos/police/use-asset-status";
 import "../demos/police/style.css";
 
@@ -31,17 +33,6 @@ function RunLocally() {
           Start Vite with <code>npm run dev</code>, then open <code>/#/demo-06</code> on the local Vite server.
         </li>
       </ol>
-    </>
-  );
-}
-
-function CasePlaceholder({ passId, onBack }: { passId: string; onBack: () => void }) {
-  return (
-    <>
-      <h2>{passId}</h2>
-      <button type="button" onClick={onBack}>
-        Back to Candidate list
-      </button>
     </>
   );
 }
@@ -91,11 +82,11 @@ export default function Demo06Police() {
         </Link>
       </header>
 
-      <main className="police-content">
+      <main className={selection ? "police-content case-content" : "police-content"}>
         <h1>Police Candidate Review</h1>
         <section
           className="police-panel"
-          aria-label={view.kind === "ready" && !statusFailed ? (selection ? "Selected Pass" : "Candidate list") : "Demo assets"}
+          aria-label={view.kind === "ready" && !statusFailed ? (selection ? "Single Case Analysis" : "Candidate list") : "Demo assets"}
         >
           {view.kind === "run-locally" ? (
             <RunLocally />
@@ -161,7 +152,7 @@ export default function Demo06Police() {
           {!statusFailed &&
             view.kind === "ready" &&
             (selection ? (
-              <CasePlaceholder passId={selection.passId} onBack={() => setSelection(null)} />
+              <CaseAnalysis key={selection.passId} selection={selection} onOpenPass={setSelection} onBack={() => setSelection(null)} />
             ) : (
               <CandidateList onOpenPass={setSelection} />
             ))}
