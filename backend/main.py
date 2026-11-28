@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
 
 from .asset_paths import asset_cache_directory
@@ -31,12 +30,6 @@ def create_app(*, asset_opener=None):
 
     app = FastAPI(title="SwissSafeDrive Demo API", lifespan=lifespan)
     app.state.asset_cache = assets.root
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-        allow_methods=["GET", "HEAD", "PATCH", "POST"],
-        allow_headers=["Content-Type", "X-SSD-Session", "Range"],
-    )
 
     session_token = settings.get("SSD_SESSION_TOKEN", "").encode()
     manual_flags: dict[str, bool] = {}
@@ -56,6 +49,12 @@ def create_app(*, asset_opener=None):
 
     @api.post("/assets/sas", status_code=202)
     async def paste_sas(request: Request):
+        if settings.get("DEMO_ASSETS_READ_SAS_URL"):
+            raise HTTPException(
+                409,
+                "The read SAS is set in the environment (.env.local). "
+                "Update DEMO_ASSETS_READ_SAS_URL there and restart the backend.",
+            )
         try:
             body = await request.json()
             if not isinstance(body, dict) or not isinstance(body.get("url"), str):

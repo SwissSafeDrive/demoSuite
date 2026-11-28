@@ -1,6 +1,6 @@
 """Project the saved bridge decision into a Candidate list row."""
 
-from .overlay import CANDIDATE_THRESHOLD, signal_color, simulated_signal
+from .overlay import CANDIDATE_THRESHOLD, simulated_signal
 
 
 def candidate_row(record):
@@ -28,5 +28,5 @@ def candidate_row(record):
         "clipId": record["clip"]["id"],
         "seekTime": seek["time_s"],
         "flagged_manually": record["flagged_manually"],
-        "signal": {**signal, "color": signal_color(confidence)} if signal else None,
+        "signal": signal,
     }

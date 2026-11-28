@@ -8,7 +8,7 @@ const candidate: Candidate = {
   seekTime: 12,
   state: "pending",
   flagged_manually: false,
-  signal: { percent: 76, color: "#e30613", label: "SIMULATED SIGNAL" },
+  signal: { percent: 76, label: "SIMULATED SIGNAL" },
 };
 
 test("the display flag hides percentages and the minimum filter while keeping labels and simulated-signal tagging", () => {

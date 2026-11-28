@@ -1,7 +1,6 @@
 export type AssetStatus = {
   state: "idle" | "missing_sas" | "checking" | "downloading" | "error" | "sas_rejected" | "ready";
   sas_configured: boolean;
-  sas_source: "env" | "pasted" | null;
   bytes_done: number;
   bytes_total: number;
   bytes_downloaded: number;
@@ -33,7 +32,7 @@ export type Candidate = ManualFlag & {
   clipId: string;
   seekTime: number;
   state: ReviewState;
-  signal: (Signal & { color: string }) | null;
+  signal: Signal | null;
 };
 
 export type PassSelection = Pick<Candidate, "passId" | "clipId" | "seekTime">;

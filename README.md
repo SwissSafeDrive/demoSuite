@@ -24,7 +24,7 @@ pip install -r backend/requirements.txt
 cp .env.example .env.local
 ```
 
-Set `SSD_SESSION_TOKEN` and `VITE_SSD_SESSION_TOKEN` in `.env.local` to the same random value. Set `DEMO_ASSETS_READ_SAS_URL` to your read SAS URL or leave it blank and use the password field in Demo 06. If the SAS set in `.env.local` expires, clear that setting and restart the backend before using the paste field.
+Set `SSD_SESSION_TOKEN` and `VITE_SSD_SESSION_TOKEN` in `.env.local` to the same random value. Set `DEMO_ASSETS_READ_SAS_URL` to your read SAS URL or leave it blank and use the password field in Demo 06. If the SAS set in `.env.local` expires, update that setting with a new read SAS URL and restart the backend.
 
 Start the backend in the activated environment.
 
