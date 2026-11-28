@@ -1,0 +1,210 @@
+.recorded-analysis {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 34%);
+  gap: 16px;
+  align-items: start;
+  color: #1a1a1a;
+}
+
+.recorded-player {
+  position: relative;
+  background: #1a1a1a;
+}
+
+.recorded-player video,
+.recorded-player canvas {
+  display: block;
+  width: 100%;
+}
+
+.recorded-player video {
+  height: clamp(220px, 55vh, 620px);
+  object-fit: contain;
+}
+
+.recorded-player canvas {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.windshield-panel,
+.pass-timeline {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  accent-color: #e30613;
+}
+
+.windshield-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.windshield-case,
+.windshield-zoom {
+  padding: 12px;
+  margin: 0;
+}
+
+.windshield-case h3,
+.pass-timeline h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.windshield-case p,
+.pass-timeline p {
+  margin: 4px 0 0;
+}
+
+.windshield-viewport {
+  aspect-ratio: 2 / 1;
+  overflow: auto;
+  background: #fff;
+  border-block: 1px solid #e0e0e0;
+}
+
+.windshield-viewport img,
+.bridge-snapshot img {
+  display: block;
+  width: 100%;
+}
+
+.windshield-viewport img {
+  max-width: none;
+  min-height: 100%;
+  object-fit: cover;
+}
+
+.windshield-viewport p {
+  padding: 12px;
+}
+
+.windshield-zoom,
+.pass-playback,
+.pass-time-bounds {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.windshield-zoom input {
+  min-width: 0;
+  flex: 1;
+}
+
+.bridge-snapshot {
+  margin: 12px 0 0;
+}
+
+.bridge-snapshot figcaption {
+  margin-top: 6px;
+}
+
+.pass-timeline {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.pass-playback,
+.pass-time-bounds {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pass-timeline input[type="range"] {
+  width: 100%;
+  margin: 0;
+}
+
+.pass-stretch-track {
+  position: relative;
+  height: 16px;
+  border-radius: 4px;
+  background: #f3f3f3;
+}
+
+.pass-stretch-track button {
+  position: absolute;
+  height: 100%;
+  min-width: 6px;
+  padding: 0;
+  border: 1px solid #999;
+  border-radius: inherit;
+  background: #d5d5d5;
+  cursor: pointer;
+}
+
+.pass-stretch-track button:hover,
+.pass-stretch-track button[aria-current="true"] {
+  border-color: #e30613;
+  background: #e30613;
+}
+
+.pass-stretches {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pass-stretches button {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.recorded-analysis .simulated-signal {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #1a1a1a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pass-playback button,
+.pass-stretches button,
+.windshield-case button {
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+  color: #1a1a1a;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pass-playback button:hover,
+.pass-stretches button:hover,
+.windshield-case button:not(:disabled):hover {
+  border-color: #e30613;
+}
+
+.windshield-case button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+@media (max-width: 700px) {
+  .recorded-analysis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .windshield-panel,
+  .pass-timeline {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
