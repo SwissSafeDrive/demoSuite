@@ -1,4 +1,4 @@
-import { formatSignal, SHOW_CONFIDENCE_PERCENT } from "../display";
+import { formatSignal, SHOW_CONFIDENCE_PERCENT, signalBand } from "../display";
 import type { ClipPlayback } from "../types";
 
 type OverlayFrames = Pick<ClipPlayback, "clip" | "frames">;
@@ -51,7 +51,9 @@ export function vehiclesAtTime({ clip, frames }: OverlayFrames, time: number) {
 type OverlayVehicle = ClipPlayback["frames"][number][number];
 
 export function overlayLabel(signal: NonNullable<OverlayVehicle["signal"]>, showPercent = SHOW_CONFIDENCE_PERCENT) {
-  return formatSignal(signal.label, signal.percent, showPercent);
+  const band = signalBand(signal.percent);
+  const label = band ? `${signal.label} · ${band}` : signal.label;
+  return formatSignal(label, signal.percent, showPercent);
 }
 
 function blurPass(source: Uint8ClampedArray, target: Uint8ClampedArray, width: number, height: number, radius: number, horizontal: boolean) {
@@ -75,6 +77,10 @@ function blurPass(source: Uint8ClampedArray, target: Uint8ClampedArray, width: n
       }
     }
   }
+}
+
+function boxBlurRadiusForGaussianSigma(sigma: number, sampleScale: number) {
+  return Math.max(1, Math.round(Math.sqrt(3) * sigma * sampleScale));
 }
 
 function blurPlate(
@@ -102,11 +108,10 @@ function blurPlate(
       sample.canvas.height = sampleHeight;
       sample.drawImage(video, left * scaleX, top * scaleY, width * scaleX, height * scaleY, 0, 0, sampleWidth, sampleHeight);
 
-      // Approximate the v5 Gaussian with a separable box blur on the sampled pixels.
       const pixels = sample.getImageData(0, 0, sampleWidth, sampleHeight);
       const intermediate = new Uint8ClampedArray(pixels.data.length);
       const sigma = Math.max(8, (x2 - x1) * 0.045);
-      const radius = Math.max(1, Math.round(Math.sqrt(3) * sigma * sampleScale));
+      const radius = boxBlurRadiusForGaussianSigma(sigma, sampleScale);
       blurPass(pixels.data, intermediate, sampleWidth, sampleHeight, radius, true);
       blurPass(intermediate, pixels.data, sampleWidth, sampleHeight, radius, false);
       sample.putImageData(pixels, 0, 0);

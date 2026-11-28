@@ -114,10 +114,18 @@ export default function CandidateList({ onOpenPass }: { onOpenPass: (selection: 
                   {visibleCandidates.map((candidate) => {
                     const { passId, clipId, seekTime } = candidate;
                     const { stateLabel, signalText, signalTag } = formatCandidateRow(candidate);
+                    const openPass = () => onOpenPass({ passId, clipId, seekTime });
                     return (
-                      <tr key={passId}>
+                      <tr key={passId} onClick={openPass}>
                         <th scope="row">
-                          <button className="police-candidate-open" type="button" onClick={() => onOpenPass({ passId, clipId, seekTime })}>
+                          <button
+                            className="police-candidate-open"
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openPass();
+                            }}
+                          >
                             {passId}
                           </button>
                           {candidate.flagged_manually && <span className="police-candidate-tag">Flagged manually</span>}

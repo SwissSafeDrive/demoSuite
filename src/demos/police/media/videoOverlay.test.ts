@@ -39,8 +39,12 @@ test("overlay selects the matching boxes and quads only for the displayed frame"
   expect(vehiclesAtTime(playback, 48.08)).toEqual([]);
 });
 
-test("hiding overlay confidence leaves the simulated signal tag visible", () => {
-  const signal = { label: "SIMULATED SIGNAL", percent: 68 } as const;
-  expect(overlayLabel(signal, false)).toBe("SIMULATED SIGNAL");
-  expect(overlayLabel(signal, true)).toBe("SIMULATED SIGNAL 68%");
+test.each([
+  [39, "SIMULATED SIGNAL"],
+  [40, "SIMULATED SIGNAL · Uncertain"],
+  [60, "SIMULATED SIGNAL · Candidate"],
+])("keeps the tag and any band at %i percent when confidence is hidden", (percent, label) => {
+  const signal = { label: "SIMULATED SIGNAL", percent } as const;
+  expect(overlayLabel(signal, false)).toBe(label);
+  expect(overlayLabel(signal, true)).toBe(`${label} ${percent}%`);
 });
