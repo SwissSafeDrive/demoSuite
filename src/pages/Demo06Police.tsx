@@ -50,8 +50,12 @@ export default function Demo06Police() {
     try {
       await action();
       refresh();
-    } catch {
-      setActionError(failureMessage);
+    } catch (error) {
+      setActionError(
+        error instanceof Error && error.message === "Demo API request failed (409)."
+          ? "The read SAS is set in the environment (.env.local). Update DEMO_ASSETS_READ_SAS_URL there and restart the backend."
+          : failureMessage,
+      );
     } finally {
       setBusy(false);
     }
@@ -108,11 +112,6 @@ export default function Demo06Police() {
             <>
               <h2>Connect demo assets</h2>
               {view.kind === "sas_rejected" && <p>The read SAS has expired or was revoked. Paste a new one.</p>}
-              {view.kind === "sas_rejected" && status?.sas_source === "env" && (
-                <p>
-                  Clear <code>DEMO_ASSETS_READ_SAS_URL</code> and restart the backend before pasting a replacement.
-                </p>
-              )}
               <form className="police-sas-form" onSubmit={submitSas}>
                 <label htmlFor="police-read-sas">Read SAS URL</label>
                 <div>

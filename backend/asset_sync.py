@@ -13,6 +13,8 @@ from threading import Event, Lock, Thread
 from urllib.error import HTTPError
 from urllib.parse import quote, urlsplit
 
+ASSET_CONTAINER = "demo-assets"
+ASSET_PREFIX = "v1"
 CHUNK_SIZE = 1024 * 1024
 
 
@@ -22,7 +24,7 @@ def azure_blob_url(url):
         if (
             parts.scheme == "https"
             and re.fullmatch(r"[a-z0-9]+\.blob\.core\.windows\.net", parts.netloc)
-            and re.fullmatch(r"(?:/[a-z0-9-]+)?/?", parts.path)
+            and parts.path in ("", "/", f"/{ASSET_CONTAINER}", f"/{ASSET_CONTAINER}/")
             and parts.query
             and not parts.fragment
             and not any(character.isspace() for character in url)
@@ -153,7 +155,7 @@ class AssetSync:
         self.worker = None
         self.stopping = Event()
         self.pending = False
-        self.progress = self._progress("idle", None)
+        self.progress = self._progress("idle", False)
 
     def status(self):
         with self.lock:
@@ -191,18 +193,16 @@ class AssetSync:
     def _prepare(self):
         self.pending = False
         url = self.settings.get("DEMO_ASSETS_READ_SAS_URL")
-        source = "env" if url else None
         read_failed = False
         if not url:
             try:
                 url = (self.root / ".read-sas").read_text(encoding="utf-8").strip()
-                source = "pasted" if url else None
             except FileNotFoundError:
                 pass
             except (OSError, UnicodeError):
                 read_failed = True
         self.url = url
-        self.progress = self._progress("checking" if url else "missing_sas", source)
+        self.progress = self._progress("checking" if url else "missing_sas", bool(url))
         if read_failed:
             self.progress.update(
                 state="error",
@@ -210,11 +210,10 @@ class AssetSync:
             )
 
     @staticmethod
-    def _progress(state, source):
+    def _progress(state, sas_configured):
         return {
             "state": state,
-            "sas_configured": source is not None,
-            "sas_source": source,
+            "sas_configured": sas_configured,
             "bytes_done": 0,
             "bytes_total": 0,
             "bytes_downloaded": 0,
@@ -269,11 +268,7 @@ class AssetSync:
 
     def _sync(self, url):
         parts = azure_blob_url(url)
-        container = parts.path.strip("/") or self.settings.get("DEMO_ASSETS_CONTAINER") or "demo-assets"
-        prefix = (self.settings.get("DEMO_ASSETS_PREFIX") or "v1").strip("/")
-        base = f"{parts.scheme}://{parts.netloc}/{quote(container, safe='')}/"
-        if prefix:
-            base += quote(prefix) + "/"
+        base = f"{parts.scheme}://{parts.netloc}/{ASSET_CONTAINER}/{ASSET_PREFIX}/"
 
         transport = nullcontext(self.opener) if self.opener else BlobRequests(parts.netloc)
         with transport as open_blob:

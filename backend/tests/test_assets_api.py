@@ -16,7 +16,7 @@ from backend.main import create_app
 SESSION = {"X-SSD-Session": "test-session"}
 FAKE_HOST = ".".join(("teststore", "blob", "core", "windows", "net"))
 FAKE_SAS = f"https://{FAKE_HOST}/?sample=private-test-value"
-CONTAINER_SAS = FAKE_SAS.replace("/?", "/custom-container?")
+CONTAINER_SAS = FAKE_SAS.replace("/?", "/demo-assets?")
 CROP_PATH = "windshield-crops/sample/Cba002-068/1203.jpg"
 
 
@@ -113,6 +113,12 @@ def test_health_is_open(client):
     assert response.json() == {"ok": True}
 
 
+def test_health_does_not_allow_cross_origin_requests(client):
+    response = client.get("/api/health", headers={"Origin": "http://localhost:5173"})
+    assert response.status_code == 200
+    assert "access-control-allow-origin" not in response.headers
+
+
 def test_missing_sas_status_requires_session(client):
     assert client.get("/api/assets/status").status_code == 401
     status = client.get("/api/assets/status", headers={"X-SSD-Session": "test-session"}).json()
@@ -145,7 +151,8 @@ def test_sync_verifies_cache_and_serves_media(asset_site, asset_client, tmp_path
         assert status["state"] == "ready"
         assert status["bytes_done"] == status["bytes_total"] == sum(map(len, assets.values()))
         assert status["files_done"] == status["files_total"] == len(assets)
-        assert status["sas_source"] == "env"
+        assert status["sas_configured"] is True
+        assert "sas_source" not in status
         assert set(asset_site.requests) == {"manifest.json", *assets.keys()} - {CROP_PATH}
         assert asset_site.paths[0] == "/demo-assets/v1/manifest.json"
         assert (cached / "manifest.json").is_file()
@@ -202,8 +209,8 @@ def test_paste_and_rejected_sas_keep_the_secret_private(asset_site, asset_client
         assert status["error"]["code"] == "sas_rejected"
         assert "expired or revoked" in status["error"]["message"]
         assert status["sas_configured"] is True
-        assert status["sas_source"] == "pasted"
-        assert asset_site.paths == ["/custom-container/v1/manifest.json"]
+        assert "sas_source" not in status
+        assert asset_site.paths == ["/demo-assets/v1/manifest.json"]
         saved = tmp_path / "cache/.read-sas"
         assert saved.read_text() == CONTAINER_SAS
         assert saved.stat().st_mode & 0o777 == 0o600
@@ -213,7 +220,7 @@ def test_paste_and_rejected_sas_keep_the_secret_private(asset_site, asset_client
     asset_site.rejected = False
     with asset_client("") as client:
         assert settled(client)["state"] == "ready"
-        assert settled(client)["sas_source"] == "pasted"
+        assert settled(client)["sas_configured"] is True
 
 
 def test_env_local_settings_and_environment_precedence(asset_site, asset_client, tmp_path, monkeypatch):
@@ -230,7 +237,7 @@ def test_env_local_settings_and_environment_precedence(asset_site, asset_client,
     with asset_client() as client:
         assert settled(client, {"X-SSD-Session": "local"})["state"] == "ready"
         assert (tmp_path / "local-cache/manifest.json").is_file()
-        assert asset_site.paths == ["/custom/env/v3/manifest.json"]
+        assert asset_site.paths == ["/demo-assets/v1/manifest.json"]
         assert client.get("/api/assets/status", headers=SESSION).status_code == 401
 
 
@@ -247,3 +254,26 @@ def test_media_returns_503_while_cache_is_checking(asset_site, asset_client):
         finally:
             asset_site.manifest_gate.set()
         assert settled(client)["state"] == "ready"
+
+
+def test_sas_for_another_container_is_rejected(asset_client):
+    with asset_client("") as client:
+        response = client.post(
+            "/api/assets/sas", headers=SESSION, json={"url": FAKE_SAS.replace("/?", "/other?")}
+        )
+        assert response.status_code == 400
+        assert settled(client)["sas_configured"] is False
+
+
+def test_environment_sas_blocks_paste(asset_site, asset_client, tmp_path):
+    asset_site.rejected = True
+    with asset_client(FAKE_SAS) as client:
+        assert settled(client)["state"] == "sas_rejected"
+        response = client.post("/api/assets/sas", headers=SESSION, json={"url": CONTAINER_SAS})
+        assert response.status_code == 409
+        assert response.json() == {
+            "detail": "The read SAS is set in the environment (.env.local). "
+            "Update DEMO_ASSETS_READ_SAS_URL there and restart the backend."
+        }
+        assert not (tmp_path / "cache/.read-sas").exists()
+        assert asset_site.paths == ["/demo-assets/v1/manifest.json"]

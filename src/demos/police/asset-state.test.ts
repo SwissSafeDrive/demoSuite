@@ -10,7 +10,6 @@ it("reports progress by bytes rather than by completed file count", () => {
     deriveAssetState({
       state: "downloading",
       sas_configured: true,
-      sas_source: "pasted",
       bytes_downloaded: 250,
       error: null,
       bytes_done: 250,

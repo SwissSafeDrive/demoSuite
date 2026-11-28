@@ -32,6 +32,7 @@ def test_candidate_scores_are_labeled_as_simulated(client):
         "Cba065-045": 81,
     }
     assert all(row["signal"]["label"] == "SIMULATED SIGNAL" for row in rows)
+    assert all(set(row["signal"]) == {"percent", "label"} for row in rows)
 
 
 def test_approach_signal_does_not_override_an_uncertain_bridge_signal(client, monkeypatch):
