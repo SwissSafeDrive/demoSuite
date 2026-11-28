@@ -1,0 +1,30 @@
+
+> swiss-safe-drive@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1367 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                      0.75 kB │ gzip:   0.42 kB
+dist/assets/index-DA0WBzU6.css                       0.59 kB │ gzip:   0.35 kB
+dist/assets/Demo06Police-CB0Xpsyp.css                5.96 kB │ gzip:   1.69 kB
+dist/assets/Demo02Camera-DvF7mnMF.css                6.91 kB │ gzip:   1.91 kB
+dist/assets/Demo05Data-CK8E2tPF.css                  7.08 kB │ gzip:   1.93 kB
+dist/assets/Demo03Eyes-DveR9mwq.css                  7.52 kB │ gzip:   2.00 kB
+dist/assets/Demo04Hazard-UkyM4cwZ.css                7.60 kB │ gzip:   2.07 kB
+dist/assets/Demo02Camera-BC_ryiAt.js                12.89 kB │ gzip:   4.41 kB
+dist/assets/Demo04Hazard-DsbLqPFE.js                13.51 kB │ gzip:   4.63 kB
+dist/assets/Demo05Data-DOyJxy74.js                  14.06 kB │ gzip:   4.49 kB
+dist/assets/Demo06Police-BeHSoyVt.js                24.22 kB │ gzip:   8.63 kB
+dist/assets/Demo01Dashboard-KF_lJiPQ.js             34.94 kB │ gzip:   8.42 kB
+dist/assets/Demo03Eyes-BOWQLfIe.js                 140.08 kB │ gzip:  43.01 kB
+dist/assets/index-jjYhrkL5.js                      176.57 kB │ gzip:  57.24 kB
+dist/assets/coco-ssd.es2017.esm.min-TLN91vAf.js  1,862.78 kB │ gzip: 295.69 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.84s

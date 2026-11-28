@@ -1,0 +1,21 @@
+
+> swiss-safe-drive@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 /workspace/demoSuite-main-port/integration
+
+ ✓ src/demos/police/media/passAnalysis.test.ts (1 test) 3ms
+ ✓ src/demos/police/asset-state.test.ts (2 tests) 3ms
+ ✓ src/demos/dashboard/state.test.ts (12 tests) 8ms
+ ✓ src/demos/police/api.test.ts (2 tests) 5ms
+ ✓ src/demos/police/observation-summary.test.ts (4 tests) 3ms
+ ✓ src/demos/police/candidate-display.test.ts (1 test) 2ms
+ ✓ src/demos/police/display.test.ts (6 tests) 2ms
+ ✓ src/demos/police/media/videoOverlay.test.ts (5 tests) 3ms
+
+ Test Files  8 passed (8)
+      Tests  33 passed (33)
+   Start at  16:01:13
+   Duration  2.43s (transform 1.94s, setup 0ms, collect 4.30s, tests 29ms, environment 1ms, prepare 462ms)
+
