@@ -4,7 +4,7 @@ const API_BASE = "/api";
 
 async function request(path: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers);
-  const token = import.meta.env.VITE_SSD_SESSION_TOKEN;
+  const token = import.meta.env.DEV ? import.meta.env.VITE_SSD_SESSION_TOKEN : undefined;
   if (token) headers.set("X-SSD-Session", token);
   if (options.body) headers.set("Content-Type", "application/json");
 
@@ -49,17 +49,17 @@ export function getPass(passId: string) {
   return fetchJson<Pass & Decision>(passPath(passId));
 }
 
-export function submitDecision(passId: string, state: ReviewState, operatorId = "demo_operator") {
+export function submitDecision(passId: string, state: ReviewState) {
   return fetchJson<Decision>(`${passPath(passId)}/decision`, {
     method: "PATCH",
-    body: JSON.stringify({ state, operator_id: operatorId }),
+    body: JSON.stringify({ state, operator_id: "demo_operator" }),
   });
 }
 
-export function flagPass(passId: string, flaggedManually = true) {
+export function flagPass(passId: string) {
   return fetchJson<ManualFlag>(`${passPath(passId)}/flag`, {
     method: "PATCH",
-    body: JSON.stringify({ flagged_manually: flaggedManually }),
+    body: JSON.stringify({ flagged_manually: true }),
   });
 }
 
