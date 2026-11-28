@@ -1,85 +1,73 @@
-import type { Estado, Registro } from './types';
+import type { RecordState, DashboardRecord } from "./types";
 
 type FourImages = readonly [string, string, string, string];
 
 const SEED_DATA = [
   {
-    inf_id: 'INF-2024-0042',
-    confianza: 0.91,
-    ubicacion: 'Via Lugano 14, Bellinzona',
-    nota_legal: 'Art. 31 LCStr — Guida distratta',
+    event_id: "INF-2024-0042",
+    confidence: 0.91,
+    location: "Via Lugano 14, Bellinzona",
+    notice: "Art. 31 SVG/LCR — Distracted driving",
   },
   {
-    inf_id: 'INF-2024-0041',
-    confianza: 0.78,
-    ubicacion: 'Piazza Grande, Locarno',
-    nota_legal: 'Art. 31 LCStr — Guida distratta',
+    event_id: "INF-2024-0041",
+    confidence: 0.78,
+    location: "Piazza Grande, Locarno",
+    notice: "Art. 31 SVG/LCR — Distracted driving",
   },
   {
-    inf_id: 'INF-2024-0040',
-    confianza: 0.85,
-    ubicacion: 'Corso Elvezia 12, Lugano',
-    nota_legal: 'Art. 31 LCStr — Guida distratta',
+    event_id: "INF-2024-0040",
+    confidence: 0.85,
+    location: "Corso Elvezia 12, Lugano",
+    notice: "Art. 31 SVG/LCR — Distracted driving",
   },
   {
-    inf_id: 'INF-2024-0039',
-    confianza: 0.62,
-    ubicacion: 'Via San Gottardo 8, Airolo',
-    nota_legal: 'Art. 31 LCStr — Guida distratta',
+    event_id: "INF-2024-0039",
+    confidence: 0.62,
+    location: "Via San Gottardo 8, Airolo",
+    notice: "Art. 31 SVG/LCR — Distracted driving",
   },
 ] as const;
 
 const OFFSETS_MIN = [8, 15, 27, 45] as const;
 
-export function seedDataset(images?: FourImages): Registro[] {
+export function seedDataset(images?: FourImages): DashboardRecord[] {
   return SEED_DATA.map((s, i) => ({
     id: i + 1,
-    inf_id: s.inf_id,
+    event_id: s.event_id,
     timestamp: new Date(Date.now() - OFFSETS_MIN[i] * 60_000),
-    confianza: s.confianza,
-    ubicacion: s.ubicacion,
-    identificatore_demo: s.inf_id,
-    imagen_path: images ? images[i] : null,
-    estado: 'pendiente' as const,
-    agente_id: null,
-    fecha_decision: null,
-    origen: 'simulato' as const,
-    nota_legal: s.nota_legal,
+    confidence: s.confidence,
+    location: s.location,
+    demo_id: s.event_id,
+    image_path: images ? images[i] : null,
+    state: "pending" as const,
+    operator_id: null,
+    decision_at: null,
+    origin: "simulated" as const,
+    notice: s.notice,
   }));
 }
 
-export function applyDecision(
-  registros: Registro[],
-  id: number,
-  estado: Estado,
-  agenteId: string,
-): Registro[] {
-  return registros.map((r) =>
-    r.id === id
-      ? { ...r, estado, agente_id: agenteId, fecha_decision: new Date() }
-      : r,
-  );
+export function applyDecision(records: DashboardRecord[], id: number, state: RecordState, operatorId: string): DashboardRecord[] {
+  return records.map((r) => (r.id === id ? { ...r, state, operator_id: operatorId, decision_at: new Date() } : r));
 }
 
-export function addSimulatedRegistro(
-  registros: Registro[],
-  imageUrl: string,
-): Registro[] {
-  const nextId = Math.max(0, ...registros.map((r) => r.id)) + 1;
-  const inf_id = `INF-2024-${String(nextId + 38).padStart(4, '0')}`;
-  const newRegistro: Registro = {
+export function addSimulatedRecord(records: DashboardRecord[], imageUrl: string): DashboardRecord[] {
+  const nextId = Math.max(0, ...records.map((r) => r.id)) + 1;
+  const event_id = `INF-2024-${String(nextId + 38).padStart(4, "0")}`;
+  const newRecord: DashboardRecord = {
     id: nextId,
-    inf_id,
+    event_id,
     timestamp: new Date(),
-    confianza: 0.75,
-    ubicacion: 'Cattura dalla telecamera',
-    identificatore_demo: inf_id,
-    imagen_path: imageUrl,
-    estado: 'pendiente',
-    agente_id: null,
-    fecha_decision: null,
-    origen: 'camara',
-    nota_legal: 'Art. 31 LCStr — Guida distratta',
+    confidence: 0.75,
+    location: "Camera capture",
+    demo_id: event_id,
+    image_path: imageUrl,
+    state: "pending",
+    operator_id: null,
+    decision_at: null,
+    origin: "camera",
+    notice: "Art. 31 SVG/LCR — Distracted driving",
   };
-  return [newRegistro, ...registros];
+  return [newRecord, ...records];
 }

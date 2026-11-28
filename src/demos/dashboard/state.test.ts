@@ -1,19 +1,19 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { seedDataset, applyDecision, addSimulatedRegistro } from './state';
-import type { Registro } from './types';
+import { describe, it, expect, beforeEach } from "vitest";
+import { seedDataset, applyDecision, addSimulatedRecord } from "./state";
+import type { DashboardRecord } from "./types";
 
-describe('seedDataset', () => {
-  it('returns exactly 4 Registros', () => {
+describe("seedDataset", () => {
+  it("returns exactly 4 records", () => {
     expect(seedDataset()).toHaveLength(4);
   });
 
-  it('all records have estado pendiente', () => {
+  it("gives all records a pending state", () => {
     for (const r of seedDataset()) {
-      expect(r.estado).toBe('pendiente');
+      expect(r.state).toBe("pending");
     }
   });
 
-  it('all timestamps are within the last 60 minutes', () => {
+  it("all timestamps are within the last 60 minutes", () => {
     const now = Date.now();
     for (const r of seedDataset()) {
       const age = now - r.timestamp.getTime();
@@ -23,78 +23,78 @@ describe('seedDataset', () => {
   });
 });
 
-describe('applyDecision', () => {
-  let registros: Registro[];
+describe("applyDecision", () => {
+  let records: DashboardRecord[];
 
   beforeEach(() => {
-    registros = seedDataset();
+    records = seedDataset();
   });
 
-  it('updates the target Registro estado', () => {
-    const updated = applyDecision(registros, 1, 'confirmato', 'agente-01');
-    const target = updated.find((r) => r.id === 1)!;
-    expect(target.estado).toBe('confirmato');
+  it("updates the target record state", () => {
+    const updated = applyDecision(records, 1, "confirmed", "operator-01");
+    const target = updated.find((r) => r.id === 1);
+    expect(target?.state).toBe("confirmed");
   });
 
-  it('sets agente_id on the target Registro', () => {
-    const updated = applyDecision(registros, 2, 'descartato', 'agente-02');
-    const target = updated.find((r) => r.id === 2)!;
-    expect(target.agente_id).toBe('agente-02');
+  it("sets operator_id on the target record", () => {
+    const updated = applyDecision(records, 2, "discarded", "operator-02");
+    const target = updated.find((r) => r.id === 2);
+    expect(target?.operator_id).toBe("operator-02");
   });
 
-  it('sets fecha_decision to a recent date', () => {
+  it("sets decision_at to a recent date", () => {
     const before = new Date();
-    const updated = applyDecision(registros, 1, 'revisado', 'agente-01');
+    const updated = applyDecision(records, 1, "reviewed", "operator-01");
     const after = new Date();
-    const target = updated.find((r) => r.id === 1)!;
-    expect(target.fecha_decision).not.toBeNull();
-    expect(target.fecha_decision!.getTime()).toBeGreaterThanOrEqual(before.getTime());
-    expect(target.fecha_decision!.getTime()).toBeLessThanOrEqual(after.getTime());
+    const target = updated.find((r) => r.id === 1);
+    const decisionTime = target?.decision_at?.getTime();
+    expect(decisionTime).toBeGreaterThanOrEqual(before.getTime());
+    expect(decisionTime).toBeLessThanOrEqual(after.getTime());
   });
 
-  it('leaves all other Registros unchanged', () => {
-    const updated = applyDecision(registros, 1, 'confirmato', 'agente-01');
+  it("leaves all other records unchanged", () => {
+    const updated = applyDecision(records, 1, "confirmed", "operator-01");
     const others = updated.filter((r) => r.id !== 1);
-    const origOthers = registros.filter((r) => r.id !== 1);
+    const origOthers = records.filter((r) => r.id !== 1);
     for (let i = 0; i < others.length; i++) {
-      expect(others[i].estado).toBe(origOthers[i].estado);
-      expect(others[i].agente_id).toBe(origOthers[i].agente_id);
+      expect(others[i].state).toBe(origOthers[i].state);
+      expect(others[i].operator_id).toBe(origOthers[i].operator_id);
     }
   });
 
-  it('does not mutate the original array', () => {
-    const original = [...registros];
-    applyDecision(registros, 1, 'confirmato', 'agente-01');
-    expect(registros[0].estado).toBe(original[0].estado);
+  it("does not mutate the original array", () => {
+    const original = [...records];
+    applyDecision(records, 1, "confirmed", "operator-01");
+    expect(records[0].state).toBe(original[0].state);
   });
 });
 
-describe('addSimulatedRegistro', () => {
-  let registros: Registro[];
+describe("addSimulatedRecord", () => {
+  let records: DashboardRecord[];
 
   beforeEach(() => {
-    registros = seedDataset();
+    records = seedDataset();
   });
 
-  it('prepends a new Registro at index 0', () => {
-    const updated = addSimulatedRegistro(registros, 'blob:test');
-    expect(updated).toHaveLength(registros.length + 1);
-    expect(updated[0].origen).toBe('camara');
+  it("prepends a new record at index 0", () => {
+    const updated = addSimulatedRecord(records, "blob:test");
+    expect(updated).toHaveLength(records.length + 1);
+    expect(updated[0].origin).toBe("camera");
   });
 
-  it('new Registro has the supplied imagen_path', () => {
-    const updated = addSimulatedRegistro(registros, 'blob:abc123');
-    expect(updated[0].imagen_path).toBe('blob:abc123');
+  it("gives the new record the supplied image_path", () => {
+    const updated = addSimulatedRecord(records, "blob:abc123");
+    expect(updated[0].image_path).toBe("blob:abc123");
   });
 
-  it('new Registro has estado pendiente', () => {
-    const updated = addSimulatedRegistro(registros, 'blob:test');
-    expect(updated[0].estado).toBe('pendiente');
+  it("gives the new record a pending state", () => {
+    const updated = addSimulatedRecord(records, "blob:test");
+    expect(updated[0].state).toBe("pending");
   });
 
-  it('does not mutate the original array', () => {
-    const originalLength = registros.length;
-    addSimulatedRegistro(registros, 'blob:test');
-    expect(registros).toHaveLength(originalLength);
+  it("does not mutate the original array", () => {
+    const originalLength = records.length;
+    addSimulatedRecord(records, "blob:test");
+    expect(records).toHaveLength(originalLength);
   });
 });

@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
   onCapture: (blobUrl: string) => void;
   onBack: () => void;
 }
 
-type CameraState = 'requesting' | 'live' | 'error';
+type CameraState = "requesting" | "live" | "error";
 
-export default function CameraEnDiretta({ onCapture, onBack }: Props) {
+export default function LiveCamera({ onCapture, onBack }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [cameraState, setCameraState] = useState<CameraState>('requesting');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [cameraState, setCameraState] = useState<CameraState>("requesting");
+  const [errorMsg, setErrorMsg] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
@@ -27,18 +27,18 @@ export default function CameraEnDiretta({ onCapture, onBack }: Props) {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-        setCameraState('live');
+        setCameraState("live");
       })
       .catch((err: Error) => {
         if (!cancelled) {
           setErrorMsg(
-            err.name === 'NotAllowedError'
-              ? 'Accesso alla telecamera negato. Verificare le autorizzazioni del browser.'
-              : err.name === 'NotFoundError'
-                ? 'Nessuna telecamera trovata sul dispositivo.'
-                : 'Impossibile accedere alla telecamera: ' + err.message,
+            err.name === "NotAllowedError"
+              ? "Camera access denied. Check your browser permissions."
+              : err.name === "NotFoundError"
+                ? "No camera found on this device."
+                : "Unable to access the camera: " + err.message,
           );
-          setCameraState('error');
+          setCameraState("error");
         }
       });
 
@@ -51,19 +51,21 @@ export default function CameraEnDiretta({ onCapture, onBack }: Props) {
   function handleCapture() {
     const video = videoRef.current;
     if (!video) return;
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    canvas.getContext('2d')!.drawImage(video, 0, 0);
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.drawImage(video, 0, 0);
     canvas.toBlob((blob) => {
       if (blob) onCapture(URL.createObjectURL(blob));
-    }, 'image/jpeg');
+    }, "image/jpeg");
   }
 
   return (
     <div className="db-cam-root">
       <style>{`
-        .db-cam-root { font-family: system-ui, sans-serif; color: #1a1a1a; max-width: 860px; margin: 0 auto; padding: 24px; }
+        .db-cam-root { font-family: inherit; color: #1a1a1a; max-width: 860px; margin: 0 auto; padding: 24px; }
         .db-cam-back { background: none; border: none; cursor: pointer; font-size: 13px; color: #6b6b6b; padding: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 4px; }
         .db-cam-back:hover { color: #1a1a1a; }
         .db-cam-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
@@ -80,46 +82,42 @@ export default function CameraEnDiretta({ onCapture, onBack }: Props) {
         .db-cam-note { margin-top: 12px; font-size: 12px; color: #6b6b6b; }
       `}</style>
 
-      <button className="db-cam-back" onClick={onBack}>← Torna alla lista</button>
-      <div className="db-cam-title">Telecamera in diretta</div>
+      <button className="db-cam-back" onClick={onBack}>
+        ← Back to records
+      </button>
+      <div className="db-cam-title">Live camera</div>
 
-      {cameraState === 'requesting' && (
+      {cameraState === "requesting" && (
         <div className="db-cam-requesting">
-          <span>Richiesta accesso telecamera...</span>
+          <span>Requesting camera access…</span>
         </div>
       )}
 
-      {cameraState === 'error' && (
+      {cameraState === "error" && (
         <div className="db-cam-error">
           <div className="db-cam-error-icon">📷</div>
-          <div className="db-cam-error-msg">{errorMsg || 'Nessuna telecamera disponibile.'}</div>
-          <button className="db-cam-back" style={{ marginTop: 8 }} onClick={onBack}>← Torna alla lista</button>
+          <div className="db-cam-error-msg">{errorMsg || "No camera available."}</div>
+          <button className="db-cam-back" style={{ marginTop: 8 }} onClick={onBack}>
+            ← Back to records
+          </button>
         </div>
       )}
 
-      {cameraState !== 'error' && (
-        <div className="db-cam-video-wrap" style={{ display: cameraState === 'requesting' ? 'none' : undefined }}>
-          <video
-            ref={videoRef}
-            className="db-cam-video"
-            autoPlay
-            muted
-            playsInline
-          />
-          {cameraState === 'live' && <div className="db-cam-live-badge">● LIVE</div>}
+      {cameraState !== "error" && (
+        <div className="db-cam-video-wrap" style={{ display: cameraState === "requesting" ? "none" : undefined }}>
+          <video ref={videoRef} className="db-cam-video" autoPlay muted playsInline />
+          {cameraState === "live" && <div className="db-cam-live-badge">● LIVE</div>}
         </div>
       )}
 
-      {cameraState === 'live' && (
+      {cameraState === "live" && (
         <>
           <div className="db-cam-actions">
             <button className="db-cam-capture" onClick={handleCapture}>
-              Acquisisci fotogramma
+              Capture frame
             </button>
           </div>
-          <div className="db-cam-note">
-            Il fotogramma verrà aggiunto come nuovo registro in stato "In attesa".
-          </div>
+          <div className="db-cam-note">The captured frame will be added as a new pending record.</div>
         </>
       )}
     </div>
