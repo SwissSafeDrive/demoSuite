@@ -75,7 +75,7 @@
 }
 
 .police-candidate-table tbody tr {
-  position: relative;
+  cursor: pointer;
 }
 
 .police-candidate-table tbody tr:hover,
@@ -89,12 +89,6 @@
   border: 0;
   background: transparent;
   color: #b6000b;
-}
-
-.police-candidate-open::after {
-  position: absolute;
-  inset: 0;
-  content: "";
 }
 
 .police-candidate-tag {

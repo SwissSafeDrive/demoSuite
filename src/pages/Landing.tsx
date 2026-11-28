@@ -104,7 +104,7 @@ export default function Landing() {
         </div>
 
         <div className="landing-demos">
-          <Link to="/demo-01" className="demo-card demo-card--live">
+          <Link to="/demo-01" className="demo-card">
             <div className="demo-number">DEMO 01</div>
             <div className="demo-title">Police Review Dashboard</div>
             <div className="demo-desc">
@@ -122,7 +122,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-02" className="demo-card demo-card--live">
+          <Link to="/demo-02" className="demo-card">
             <div className="demo-number">DEMO 02</div>
             <div className="demo-title">Camera AI Analyzer</div>
             <div className="demo-desc">
@@ -140,7 +140,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-03" className="demo-card demo-card--live">
+          <Link to="/demo-03" className="demo-card">
             <div className="demo-number">DEMO 03</div>
             <div className="demo-title">Eye Concentration Monitor</div>
             <div className="demo-desc">
@@ -158,7 +158,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-04" className="demo-card demo-card--live">
+          <Link to="/demo-04" className="demo-card">
             <div className="demo-number">DEMO 04</div>
             <div className="demo-title">In-Car Hazard Alert System</div>
             <div className="demo-desc">Dashcam-style AI that detects pedestrians, vehicles and cyclists and scores collision risk in real time.</div>
@@ -174,7 +174,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-05" className="demo-card demo-card--live">
+          <Link to="/demo-05" className="demo-card">
             <div className="demo-number">DEMO 05</div>
             <div className="demo-title">AI Training Data Collector</div>
             <div className="demo-desc">
