@@ -7,6 +7,7 @@ const Demo02Camera = lazy(() => import("./pages/Demo02Camera"));
 const Demo03Eyes = lazy(() => import("./pages/Demo03Eyes"));
 const Demo04Hazard = lazy(() => import("./pages/Demo04Hazard"));
 const Demo05Data = lazy(() => import("./pages/Demo05Data"));
+const Demo06Police = lazy(() => import("./pages/Demo06Police"));
 
 function LoadingFallback() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/demo-03" element={<Demo03Eyes />} />
           <Route path="/demo-04" element={<Demo04Hazard />} />
           <Route path="/demo-05" element={<Demo05Data />} />
+          <Route path="/demo-06" element={<Demo06Police />} />
         </Routes>
       </Suspense>
     </HashRouter>

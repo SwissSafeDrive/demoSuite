@@ -50,7 +50,7 @@ export default function Landing() {
           text-decoration: none; color: inherit; display: block;
           transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .demo-card--live:hover { border-color: var(--text); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .demo-card:hover { border-color: var(--text); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
         .demo-number { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 16px; }
         .demo-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .demo-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 24px; }
@@ -59,6 +59,7 @@ export default function Landing() {
           font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
         }
         .demo-status--live { color: var(--safe); }
+        .demo-status--local { color: #8a3d00; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; }
         .status-dot--live { background: var(--safe); animation: pulse 2s infinite; }
         @keyframes pulse {
@@ -189,6 +190,16 @@ export default function Landing() {
               <span className="status-dot status-dot--live" />
               Live Demo
             </div>
+          </Link>
+          <Link to="/demo-06" className="demo-card">
+            <div className="demo-number">DEMO 06</div>
+            <div className="demo-title">Police Candidate Review</div>
+            <div className="demo-desc">Review simulated behaviour signals using real bridge footage.</div>
+            <ul className="demo-features">
+              <li>Candidate list</li>
+              <li>Single Case Analysis</li>
+            </ul>
+            <div className="demo-status demo-status--local">Run locally</div>
           </Link>
         </div>
       </main>
