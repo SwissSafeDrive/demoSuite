@@ -107,13 +107,13 @@ export default function Landing() {
             <div className="demo-number">DEMO 01</div>
             <div className="demo-title">Police Review Dashboard</div>
             <div className="demo-desc">
-              Cruscotto istituzionale per la revisione umana delle infrazioni segnalate dall'AI. Nessuna multa viene emessa automaticamente.
+              A police dashboard for human review of AI-flagged infractions. The dashboard never issues fines automatically.
             </div>
             <ul className="demo-features">
-              <li>Lista registri con badge di stato</li>
-              <li>Dettaglio con immagine e metadati AI</li>
-              <li>Flusso decisionale: conferma / scarta / revisione</li>
-              <li>Dati simulati — nessun backend richiesto</li>
+              <li>Record list with status badges</li>
+              <li>Record details with an image and AI metadata</li>
+              <li>Confirm, discard, or mark for review</li>
+              <li>Simulated data with no backend required</li>
             </ul>
             <div className="demo-status demo-status--live">
               <span className="status-dot status-dot--live" />

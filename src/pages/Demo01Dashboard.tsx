@@ -1,55 +1,53 @@
-import { useReducer, useState } from 'react';
-import { Link } from 'react-router-dom';
-import type { Estado, Registro } from '../demos/dashboard/types';
-import { seedDataset, applyDecision, addSimulatedRegistro } from '../demos/dashboard/state';
-import { cameraImages } from '../demos/dashboard/assets/index';
-import RegistriList from '../demos/dashboard/RegistriList';
-import RegistroDetalle from '../demos/dashboard/RegistroDetalle';
-import CameraEnDiretta from '../demos/dashboard/CameraEnDiretta';
+import { useReducer, useState } from "react";
+import { Link } from "react-router-dom";
+import type { RecordState, DashboardRecord } from "../demos/dashboard/types";
+import { seedDataset, applyDecision, addSimulatedRecord } from "../demos/dashboard/state";
+import { cameraImages } from "../demos/dashboard/assets/index";
+import RecordsList from "../demos/dashboard/RecordsList";
+import RecordDetail from "../demos/dashboard/RecordDetail";
+import LiveCamera from "../demos/dashboard/LiveCamera";
 
-type View = 'list' | 'detalle' | 'camera';
+type View = "list" | "detail" | "camera";
 
-type Action =
-  | { type: 'DECIDE'; id: number; estado: Estado; agenteId: string }
-  | { type: 'ADD_REGISTRO'; imageUrl: string };
+type Action = { type: "DECIDE"; id: number; state: RecordState; operatorId: string } | { type: "ADD_RECORD"; imageUrl: string };
 
-function reducer(state: Registro[], action: Action): Registro[] {
+function reducer(state: DashboardRecord[], action: Action): DashboardRecord[] {
   switch (action.type) {
-    case 'DECIDE':
-      return applyDecision(state, action.id, action.estado, action.agenteId);
-    case 'ADD_REGISTRO':
-      return addSimulatedRegistro(state, action.imageUrl);
+    case "DECIDE":
+      return applyDecision(state, action.id, action.state, action.operatorId);
+    case "ADD_RECORD":
+      return addSimulatedRecord(state, action.imageUrl);
     default:
       return state;
   }
 }
 
 export default function Demo01Dashboard() {
-  const [registros, dispatch] = useReducer(reducer, undefined, () => seedDataset(cameraImages));
-  const [view, setView] = useState<View>('list');
+  const [records, dispatch] = useReducer(reducer, undefined, () => seedDataset(cameraImages));
+  const [view, setView] = useState<View>("list");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const selected = selectedId !== null ? registros.find((r) => r.id === selectedId) ?? null : null;
+  const selected = selectedId !== null ? (records.find((r) => r.id === selectedId) ?? null) : null;
 
-  function openRegistro(r: Registro) {
+  function openRecord(r: DashboardRecord) {
     setSelectedId(r.id);
-    setView('detalle');
+    setView("detail");
   }
 
-  function handleDecide(estado: Estado) {
+  function handleDecide(state: RecordState) {
     if (selectedId === null) return;
-    dispatch({ type: 'DECIDE', id: selectedId, estado, agenteId: 'agente-demo' });
-    setView('list');
+    dispatch({ type: "DECIDE", id: selectedId, state, operatorId: "operator-demo" });
+    setView("list");
     setSelectedId(null);
   }
 
   function handleCapture(imageUrl: string) {
-    dispatch({ type: 'ADD_REGISTRO', imageUrl });
-    setView('list');
+    dispatch({ type: "ADD_RECORD", imageUrl });
+    setView("list");
   }
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: '#1a1a1a' }}>
+    <div style={{ minHeight: "100vh", fontFamily: "inherit", color: "#1a1a1a" }}>
       <style>{`
         .db-header {
           display: flex; align-items: center; justify-content: space-between;
@@ -81,49 +79,49 @@ export default function Demo01Dashboard() {
           <span className="db-demo-badge">DEMO 01</span>
         </div>
         <div className="db-header-right">
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Cruscotto di revisione polizia</span>
-          <Link to="/" className="db-back-link">← Demo</Link>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Police review dashboard</span>
+          <Link to="/" className="db-back-link">
+            ← Demo
+          </Link>
         </div>
       </header>
 
       <div className="db-nav">
         <button
-          className={`db-nav-btn${view === 'list' ? ' db-nav-btn--active' : ''}`}
-          onClick={() => { setView('list'); setSelectedId(null); }}
+          className={`db-nav-btn${view === "list" ? " db-nav-btn--active" : ""}`}
+          onClick={() => {
+            setView("list");
+            setSelectedId(null);
+          }}
         >
-          Registri
+          Records
         </button>
-        <button
-          className={`db-nav-btn${view === 'camera' ? ' db-nav-btn--active' : ''}`}
-          onClick={() => setView('camera')}
-        >
-          Telecamera in diretta
+        <button className={`db-nav-btn${view === "camera" ? " db-nav-btn--active" : ""}`} onClick={() => setView("camera")}>
+          Live camera
         </button>
       </div>
 
       <div className="db-content">
-        {view === 'list' && (
+        {view === "list" && (
           <>
-            <div className="db-section-title">Registro infrazioni</div>
-            <div className="db-section-sub">Infrazioni segnalate dall'AI — dati simulati a scopo dimostrativo</div>
-            <RegistriList registros={registros} onOpenRegistro={openRegistro} />
+            <div className="db-section-title">Infraction records</div>
+            <div className="db-section-sub">AI-flagged infractions using simulated demo data</div>
+            <RecordsList records={records} onOpenRecord={openRecord} />
           </>
         )}
 
-        {view === 'detalle' && selected && (
-          <RegistroDetalle
-            registro={selected}
+        {view === "detail" && selected && (
+          <RecordDetail
+            record={selected}
             onDecide={handleDecide}
-            onBack={() => { setView('list'); setSelectedId(null); }}
+            onBack={() => {
+              setView("list");
+              setSelectedId(null);
+            }}
           />
         )}
 
-        {view === 'camera' && (
-          <CameraEnDiretta
-            onCapture={handleCapture}
-            onBack={() => setView('list')}
-          />
-        )}
+        {view === "camera" && <LiveCamera onCapture={handleCapture} onBack={() => setView("list")} />}
       </div>
     </div>
   );
