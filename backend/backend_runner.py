@@ -1,6 +1,5 @@
 """Run the demo API on loopback."""
 
-import os
 from pathlib import Path
 import sys
 
@@ -11,10 +10,12 @@ def main():
     if not __package__:
         sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+    from backend.config import load_settings
+
     uvicorn.run(
         "backend.main:app",
         host="127.0.0.1",
-        port=int(os.environ.get("SSD_PORT") or "8765"),
+        port=int(load_settings().get("SSD_PORT") or "8765"),
         access_log=False,
     )
 

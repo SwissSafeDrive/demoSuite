@@ -19,16 +19,16 @@ def overlay_for_clip(clip_id):
     return clip_overlay(load_passes().values(), clip_id)
 
 
-def clip_path(clip_id):
+def clip_path(clip_id, cache):
     if clip_id in CLIPS:
         try:
-            return locate_clip(clip_id)
+            return locate_clip(clip_id, cache)
         except FileNotFoundError:
             pass
     raise HTTPException(404, "Demo clip unavailable")
 
 
-def create_clip_router(verify_session):
+def create_clip_router(verify_session, cache, require_footage):
     router = APIRouter(prefix="/api/clips")
     playback_key = secrets.token_bytes(32)
 
@@ -38,7 +38,8 @@ def create_clip_router(verify_session):
 
     @router.get("/{clip_id}/playback", dependencies=[Depends(verify_session)])
     def playback(clip_id: str):
-        clip_path(clip_id)
+        require_footage()
+        clip_path(clip_id, cache)
         # Native video requests cannot attach the API session header.
         expires = int(time.time()) + 3600
         return {
@@ -57,8 +58,9 @@ def create_clip_router(verify_session):
             supplied_signature.encode(), signature(clip_id, expires).encode()
         ):
             raise HTTPException(401, "Playback authorization expired or invalid")
+        require_footage()
         return FileResponse(
-            clip_path(clip_id),
+            clip_path(clip_id, cache),
             media_type="video/mp4",
             headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"},
         )

@@ -11,9 +11,10 @@ PASS_PATH = f"/api/passes/{PASS_ID}"
 DECISION_PATH = f"{PASS_PATH}/decision"
 
 
-def test_review_decisions_follow_the_pass_after_playback(client, tmp_path):
+def test_review_decisions_follow_the_pass_after_playback(client, tmp_path, monkeypatch):
     footage = tmp_path / "footage"
     footage.mkdir()
+    monkeypatch.setenv("SSD_FOOTAGE_DIR", str(footage))
     (footage / "Cba052.mp4").write_bytes(b"test footage")
     assert client.get(PASS_PATH, headers=SESSION).json()["state"] == "pending"
     for state in ("discarded", "reviewed", "confirmed", "pending"):
@@ -50,8 +51,10 @@ def test_decision_rejects_unknown_pass_and_invalid_state(client):
     assert client.patch(DECISION_PATH, json={"state": "invalid"}, headers=SESSION).status_code == 422
 
 
-def test_missing_cache_returns_clip_404(client):
-    assert client.get("/api/clips/Cba052/playback", headers=SESSION).status_code == 404
+def test_missing_cache_returns_clip_503(client):
+    response = client.get("/api/clips/Cba052/playback", headers=SESSION)
+    assert response.status_code == 503
+    assert response.json() == {"detail": "Demo assets are not ready"}
 
 
 def test_new_app_starts_with_pending_decisions_and_original_flags(client):

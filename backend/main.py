@@ -1,27 +1,44 @@
 import os
 import secrets
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 
+from .asset_paths import asset_cache_directory
+from .asset_sync import AssetSync
 from .candidate_membership import candidate_row
 from .clip_routes import create_clip_router
+from .config import load_settings
 from .crop_routes import router as crop_router
 from .pass_fixture import load_passes
 from .schemas import DecisionIn, DecisionOut, ManualFlagIn
 
 
-def create_app():
-    app = FastAPI(title="SwissSafeDrive Demo API")
+def create_app(*, asset_opener=None):
+    settings = load_settings()
+    assets = AssetSync(asset_cache_directory(settings), settings, asset_opener)
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        assets.start()
+        try:
+            yield
+        finally:
+            await run_in_threadpool(assets.stop)
+
+    app = FastAPI(title="SwissSafeDrive Demo API", lifespan=lifespan)
+    app.state.asset_cache = assets.root
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-        allow_methods=["GET", "HEAD", "PATCH"],
+        allow_methods=["GET", "HEAD", "PATCH", "POST"],
         allow_headers=["Content-Type", "X-SSD-Session", "Range"],
     )
 
-    session_token = os.environ.get("SSD_SESSION_TOKEN", "").encode()
+    session_token = settings.get("SSD_SESSION_TOKEN", "").encode()
     manual_flags: dict[str, bool] = {}
     decisions: dict[str, DecisionOut] = {}
 
@@ -32,6 +49,28 @@ def create_app():
             raise HTTPException(401, "Unauthorized session")
 
     api = APIRouter(prefix="/api", dependencies=[Depends(verify_session_token)])
+
+    @api.get("/assets/status")
+    def asset_status():
+        return assets.status()
+
+    @api.post("/assets/sas", status_code=202)
+    async def paste_sas(request: Request):
+        try:
+            body = await request.json()
+            if not isinstance(body, dict) or not isinstance(body.get("url"), str):
+                raise ValueError
+            await run_in_threadpool(assets.paste, body["url"])
+        except (ValueError, RecursionError):
+            raise HTTPException(400, "Enter a valid HTTPS Azure Blob read SAS URL") from None
+        except OSError:
+            raise HTTPException(500, "Could not save the read SAS") from None
+        return {"ok": True}
+
+    @api.post("/assets/retry", status_code=202)
+    def retry_assets():
+        assets.start()
+        return {"ok": True}
 
     def require_pass(pass_id):
         record = load_passes().get(pass_id)
@@ -83,9 +122,26 @@ def create_app():
                 rows.append({**row, "state": decision.state if decision else "pending"})
         return rows
 
+    @app.get("/api/health")
+    def health():
+        return {"ok": True}
+
+    def require_ready_assets(override_key):
+        if not os.environ.get(override_key) and assets.status()["state"] != "ready":
+            raise HTTPException(503, "Demo assets are not ready")
+
+    def require_crops():
+        require_ready_assets("SSD_CROP_DIR")
+
     app.include_router(api)
-    app.include_router(crop_router, dependencies=[Depends(verify_session_token)])
-    app.include_router(create_clip_router(verify_session_token))
+    app.include_router(
+        crop_router, dependencies=[Depends(verify_session_token), Depends(require_crops)]
+    )
+    app.include_router(
+        create_clip_router(
+            verify_session_token, assets.root, lambda: require_ready_assets("SSD_FOOTAGE_DIR")
+        )
+    )
     return app
 
 
