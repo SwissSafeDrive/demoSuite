@@ -28,4 +28,9 @@ export default [
       "no-useless-catch": "error",
     },
   },
+  {
+    files: ["**/*.cjs"],
+    languageOptions: { globals: globals.node },
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ];
