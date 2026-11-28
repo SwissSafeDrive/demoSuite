@@ -1,16 +1,16 @@
-export type Estado = 'pendiente' | 'revisado' | 'confirmato' | 'descartato';
+export type RecordState = "pending" | "reviewed" | "confirmed" | "discarded";
 
-export interface Registro {
+export interface DashboardRecord {
   id: number;
-  inf_id: string;
+  event_id: string;
   timestamp: Date;
-  confianza: number;
-  ubicacion: string;
-  identificatore_demo: string;
-  imagen_path: string | null;
-  estado: Estado;
-  agente_id: string | null;
-  fecha_decision: Date | null;
-  origen: 'simulato' | 'camara';
-  nota_legal: string;
+  confidence: number;
+  location: string;
+  demo_id: string;
+  image_path: string | null;
+  state: RecordState;
+  operator_id: string | null;
+  decision_at: Date | null;
+  origin: "simulated" | "camera";
+  notice: string;
 }

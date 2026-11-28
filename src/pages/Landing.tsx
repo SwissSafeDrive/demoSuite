@@ -50,7 +50,7 @@ export default function Landing() {
           text-decoration: none; color: inherit; display: block;
           transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .demo-card--live:hover { border-color: var(--text); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .demo-card:hover { border-color: var(--text); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
         .demo-number { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 16px; }
         .demo-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .demo-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 24px; }
@@ -59,6 +59,7 @@ export default function Landing() {
           font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
         }
         .demo-status--live { color: var(--safe); }
+        .demo-status--local { color: #8a3d00; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; }
         .status-dot--live { background: var(--safe); animation: pulse 2s infinite; }
         @keyframes pulse {
@@ -103,17 +104,17 @@ export default function Landing() {
         </div>
 
         <div className="landing-demos">
-          <Link to="/demo-01" className="demo-card demo-card--live">
+          <Link to="/demo-01" className="demo-card">
             <div className="demo-number">DEMO 01</div>
             <div className="demo-title">Police Review Dashboard</div>
             <div className="demo-desc">
-              Cruscotto istituzionale per la revisione umana delle infrazioni segnalate dall'AI. Nessuna multa viene emessa automaticamente.
+              A police dashboard for human review of AI-flagged infractions. The dashboard never issues fines automatically.
             </div>
             <ul className="demo-features">
-              <li>Lista registri con badge di stato</li>
-              <li>Dettaglio con immagine e metadati AI</li>
-              <li>Flusso decisionale: conferma / scarta / revisione</li>
-              <li>Dati simulati — nessun backend richiesto</li>
+              <li>Record list with status badges</li>
+              <li>Record details with an image and AI metadata</li>
+              <li>Confirm, discard, or mark for review</li>
+              <li>Simulated data with no backend required</li>
             </ul>
             <div className="demo-status demo-status--live">
               <span className="status-dot status-dot--live" />
@@ -121,7 +122,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-02" className="demo-card demo-card--live">
+          <Link to="/demo-02" className="demo-card">
             <div className="demo-number">DEMO 02</div>
             <div className="demo-title">Camera AI Analyzer</div>
             <div className="demo-desc">
@@ -139,7 +140,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-03" className="demo-card demo-card--live">
+          <Link to="/demo-03" className="demo-card">
             <div className="demo-number">DEMO 03</div>
             <div className="demo-title">Eye Concentration Monitor</div>
             <div className="demo-desc">
@@ -157,7 +158,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-04" className="demo-card demo-card--live">
+          <Link to="/demo-04" className="demo-card">
             <div className="demo-number">DEMO 04</div>
             <div className="demo-title">In-Car Hazard Alert System</div>
             <div className="demo-desc">Dashcam-style AI that detects pedestrians, vehicles and cyclists and scores collision risk in real time.</div>
@@ -173,7 +174,7 @@ export default function Landing() {
             </div>
           </Link>
 
-          <Link to="/demo-05" className="demo-card demo-card--live">
+          <Link to="/demo-05" className="demo-card">
             <div className="demo-number">DEMO 05</div>
             <div className="demo-title">AI Training Data Collector</div>
             <div className="demo-desc">
@@ -189,6 +190,16 @@ export default function Landing() {
               <span className="status-dot status-dot--live" />
               Live Demo
             </div>
+          </Link>
+          <Link to="/demo-06" className="demo-card">
+            <div className="demo-number">DEMO 06</div>
+            <div className="demo-title">Police Candidate Review</div>
+            <div className="demo-desc">Review simulated behaviour signals using real bridge footage.</div>
+            <ul className="demo-features">
+              <li>Candidate list</li>
+              <li>Single Case Analysis</li>
+            </ul>
+            <div className="demo-status demo-status--local">Run locally</div>
           </Link>
         </div>
       </main>
