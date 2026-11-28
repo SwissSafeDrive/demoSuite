@@ -3,16 +3,18 @@
 import os
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+from .config import REPO_ROOT, load_settings
 
 
-def asset_cache_directory():
-    return Path(os.environ.get("SSD_ASSET_CACHE_DIR") or REPO_ROOT / ".demo-assets")
+def asset_cache_directory(settings=None):
+    if settings is None:
+        settings = load_settings()
+    return Path(settings.get("SSD_ASSET_CACHE_DIR") or REPO_ROOT / ".demo-assets")
 
 
-def footage_directory():
-    return Path(os.environ.get("SSD_FOOTAGE_DIR") or asset_cache_directory() / "footage")
+def footage_directory(cache=None):
+    return Path(os.environ.get("SSD_FOOTAGE_DIR") or (cache or asset_cache_directory()) / "footage")
 
 
-def crop_directory():
-    return Path(os.environ.get("SSD_CROP_DIR") or asset_cache_directory() / "windshield-crops")
+def crop_directory(cache=None):
+    return Path(os.environ.get("SSD_CROP_DIR") or (cache or asset_cache_directory()) / "windshield-crops")
